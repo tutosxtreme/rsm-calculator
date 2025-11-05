@@ -49,6 +49,10 @@
                    class="w-full p-3 text-2xl font-extrabold text-center border-red-400 border-2 rounded-lg focus:ring-red-600 focus:border-red-600 transition duration-150"
                    placeholder="0">
             <p class="text-xs text-red-700 mt-1 text-center">Enter a value between -45% and +45%.</p>
+            <!-- ERROR MESSAGE AREA -->
+            <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 p-2 rounded-lg mt-2 hidden" role="alert">
+                Value must be between -45 and 45.
+            </div>
         </div>
         
         <!-- Input Section: Category Breakdown -->
@@ -197,6 +201,8 @@
         ];
         const MIN_CAP = 0.80; // 80% minimum payout
         const MAX_CAP = 1.25; // 125% maximum payout
+        const ACCELERATOR_MIN = -45; // New minimum
+        const ACCELERATOR_MAX = 45;  // New maximum
 
         // Tier definitions for Max Payouts based on Net GP MTD
         const GP_TIERS = [
@@ -258,6 +264,8 @@
             const maxPayouts = getMaxPayouts(netGpMtd);
 
             const acceleratorInput = document.getElementById('acceleratorInput');
+            const acceleratorError = document.getElementById('acceleratorError');
+            
             // Accelerator defaults to 0 if the field is empty
             const acceleratorValue = parseFloat(acceleratorInput.value || 0); 
             const acceleratorPercent = acceleratorValue / 100;
@@ -347,11 +355,15 @@
             // --- 5. Final Calculations and Display ---
 
             // Check Accelerator Validation against the new bounds (-45 and 45)
-            if (acceleratorValue < -45 || acceleratorValue > 45) {
-                 // If accelerator is out of bounds, set final display to 0
+            if (acceleratorValue < ACCELERATOR_MIN || acceleratorValue > ACCELERATOR_MAX) {
+                 // If accelerator is out of bounds, display error and zero out payouts
+                acceleratorError.classList.remove('hidden'); 
                 document.getElementById('totalBaseCommission').textContent = formatCurrency(0);
                 document.getElementById('finalPayout').textContent = formatCurrency(0);
                 return;
+            } else {
+                // If valid, ensure error is hidden
+                acceleratorError.classList.add('hidden'); 
             }
             
             // Update Total Base Commission display
