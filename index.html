@@ -214,7 +214,8 @@
                     <!-- Final Payout (with Accelerator) - High Contrast -->
                     <div class="flex justify-between items-center p-8 bg-gray-800 rounded-2xl shadow-2xl border-b-4 border-cyan-500 transition duration-300">
                         <p class="text-xl md:text-2xl font-black text-white tracking-wider">FINAL PAYOUT</p>
-                        <p id="finalPayout" class="text-3xl sm:text-4xl md:text-5xl font-black text-cyan-400">$0.00</p>
+                        <!-- FIX: Changed md:text-5xl to md:text-4xl to prevent overflow in landscape mode -->
+                        <p id="finalPayout" class="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-black text-cyan-400">$0.00</p>
                     </div>
                 </div>
             </div>
