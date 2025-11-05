@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -60,12 +60,12 @@
                     <div class="w-1/2">
                         <label for="voiceTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                         <input type="number" id="voiceTarget" data-category="voice" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
                         <label for="voiceActual" class="block text-xs font-medium text-gray-600 mb-2">Actual (Qty)</label>
                         <input type="number" id="voiceActual" data-category="voice" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                 </div>
             </div>
@@ -76,12 +76,12 @@
                     <div class="w-1/2">
                         <label for="btsTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                         <input type="number" id="btsTarget" data-category="bts" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
                         <label for="btsActual" class="block text-xs font-medium text-gray-600 mb-2">Actual (Qty)</label>
                         <input type="number" id="btsActual" data-category="bts" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                 </div>
             </div>
@@ -92,12 +92,12 @@
                     <div class="w-1/2">
                         <label for="vafTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                         <input type="number" id="vafTarget" data-category="vaf" value="19" min="1" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
                         <label for="vafActual" class="block text-xs font-medium text-gray-600 mb-2">Actual ($)</label>
                         <input type="number" id="vafActual" data-category="vaf" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                 </div>
             </div>
@@ -108,12 +108,12 @@
                     <div class="w-1/2">
                         <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                         <input type="number" id="accessoriesTarget" data-category="accessories" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
                         <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 mb-2">Actual ($)</label>
                         <input type="number" id="accessoriesActual" data-category="accessories" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                 </div>
             </div>
@@ -183,7 +183,7 @@
             { name: 'VAF', id: 'vaf' },
             { name: 'Accessories', id: 'accessories' },
         ];
-        const MIN_CAP = 0.80; // 80% minimum payout
+        const MIN_CAP = 0.80; // 80% minimum payout threshold
         const MAX_CAP = 1.25; // 125% maximum payout
         const ACCELERATOR_MIN = -45; 
         const ACCELERATOR_MAX = 45;  
@@ -289,13 +289,13 @@
                 // 2. Calculate Percentage to Goal (P2G)
                 const percentageToGoal = actual / target;
 
-                // 3. Apply Minimum (80%) and Maximum (125%) Cap
+                // 3. Apply Minimum (0% below 80%) and Maximum (125%) Cap
                 let cappedPercentage = percentageToGoal;
                 let capStatus;
                 
                 if (percentageToGoal < MIN_CAP) {
-                    cappedPercentage = MIN_CAP;
-                    capStatus = 'Min Cap (80%)';
+                    cappedPercentage = 0; // Payout is $0 if below 80%
+                    capStatus = 'Below Minimum (0%)';
                 } else if (percentageToGoal > MAX_CAP) {
                     cappedPercentage = MAX_CAP;
                     capStatus = 'Max Cap (125%)';
@@ -315,8 +315,8 @@
                 
                 // Goal Status Text
                 let goalText = p2gDisplay;
-                if (capStatus === 'Min Cap (80%)') {
-                    goalText += ` (Capped at 80%)`;
+                if (capStatus === 'Below Minimum (0%)') {
+                    goalText += ` (No Payout below 80%)`;
                 } else if (capStatus === 'Max Cap (125%)') {
                     goalText += ` (Capped at 125%)`;
                 } else {
@@ -328,7 +328,7 @@
                 // Color coding for individual payout
                 payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
                 if (percentageToGoal < MIN_CAP) {
-                    payoutElement.classList.add('text-red-700'); // Below minimum
+                    payoutElement.classList.add('text-red-700'); // Below minimum (now zero payout)
                 } else if (percentageToGoal >= 1) {
                     payoutElement.classList.add('text-green-600'); // At or above 100%
                 } else {
