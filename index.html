@@ -4,16 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RSM Bonus Calculator</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f9;
+            background-color: #f8fafc; /* Very light, clean background */
+            color: #334155; 
         }
-        /* Style for number inputs */
+        /* Hide number input spin buttons */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -24,168 +23,152 @@
         }
     </style>
 </head>
-<body class="min-h-screen p-4 flex flex-col items-center">
+<body class="min-h-screen p-6 flex flex-col items-center justify-center overflow-x-hidden">
 
-    <div id="app" class="w-full max-w-lg bg-white p-6 shadow-xl rounded-2xl">
-        <h1 class="text-3xl font-extrabold text-gray-800 mb-6 text-center">
+    <!-- Main Calculator Panel - Flat, Elevated Look --><div id="app" class="w-full max-w-lg bg-white p-10 shadow-3xl rounded-2xl transition-all duration-300">
+        <h1 class="text-4xl font-extrabold text-gray-800 mb-10 text-center border-b border-gray-200 pb-5">
             RSM Bonus Calculator
         </h1>
 
-        <!-- Net GP MTD Input -->
-        <div class="bg-gray-100 p-4 rounded-lg shadow-inner mb-6 border-l-4 border-gray-400">
-            <label for="netGpMtdInput" class="block text-sm font-bold text-gray-700 mb-2">Store’s Net Gross Profit ($)</label>
+        <!-- Store's Net Gross Profit Input --><div class="bg-gray-50 p-6 rounded-xl shadow-2xl mb-8 border-l-4 border-cyan-500">
+            <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 mb-3">Store’s Net Gross Profit ($)</label>
             <input type="number" id="netGpMtdInput" value="" min="0" oninput="calculateCommission()"
-                   class="w-full p-3 text-xl font-extrabold text-center border-gray-300 border-2 rounded-lg focus:ring-red-600 focus:border-red-600 transition duration-150"
-                   placeholder="Enter Total Gross Profit">
-            <div id="tierStatus" class="text-xs text-gray-600 mt-2 text-center font-medium">
+                   class="w-full p-4 text-2xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition duration-150 shadow-inner"
+                   placeholder="Enter Gross Profit">
+            <div id="tierStatus" class="text-xs text-cyan-600 mt-4 text-center font-medium">
                 Payout rates based on the amount above.
             </div>
         </div>
 
-        <!-- Accelerator Input (Manual Type) -->
-        <div class="bg-red-100 p-4 rounded-lg shadow-inner mb-6 border-l-4 border-red-500">
-            <label for="acceleratorInput" class="block text-sm font-bold text-red-700 mb-2">Accelerator / Decelerator (%)</label>
+        <!-- Accelerator Input --><div class="bg-gray-50 p-6 rounded-xl shadow-2xl mb-8 border-l-4 border-red-500">
+            <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 mb-3">Accelerator / Decelerator (%)</label>
             <input type="number" id="acceleratorInput" value="" min="-45" max="45" step="1" oninput="calculateCommission()"
-                   class="w-full p-3 text-2xl font-extrabold text-center border-red-400 border-2 rounded-lg focus:ring-red-600 focus:border-red-600 transition duration-150"
+                   class="w-full p-4 text-2xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 transition duration-150 shadow-inner"
                    placeholder="0">
-            <p class="text-xs text-red-700 mt-1 text-center">Enter a value between -45% and +45%.</p>
-            <!-- ERROR MESSAGE AREA -->
-            <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 p-2 rounded-lg mt-2 hidden" role="alert">
-                Value must be between -45 and 45.
+            <p class="text-xs text-red-600 mt-2 text-center">Range: -45% to +45%.</p>
+            <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 p-3 rounded-xl mt-4 shadow-lg hidden" role="alert">
+                Error: Value must be between -45 and 45.
             </div>
         </div>
         
-        <!-- Input Section: Category Breakdown -->
-        <h2 class="text-xl font-semibold text-gray-700 mb-4 border-b pb-2">Targets & Actuals</h2>
-        <div id="categoryInputs" class="space-y-4 mb-8">
+        <!-- Input Section: Category Breakdown --><h2 class="text-2xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3">Targets & Actuals</h2>
+        <div id="categoryInputs" class="space-y-6 mb-10">
 
-            <!-- Voice Card (Qty) -->
-            <div class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                <h3 class="text-base font-bold text-gray-800 mb-2">Voice</h3>
-                <div class="flex space-x-2">
+            <!-- Voice Card (Qty) --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Voice</h3>
+                <div class="flex space-x-4">
                     <div class="w-1/2">
-                        <label for="voiceTarget" class="block text-xs font-medium text-gray-500 mb-1">Target (Qty)</label>
+                        <label for="voiceTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                         <input type="number" id="voiceTarget" data-category="voice" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-2 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-red-600">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
-                        <label for="voiceActual" class="block text-xs font-medium text-gray-500 mb-1">Actual (Qty)</label>
+                        <label for="voiceActual" class="block text-xs font-medium text-gray-600 mb-2">Actual (Qty)</label>
                         <input type="number" id="voiceActual" data-category="voice" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-2 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-red-600">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                 </div>
             </div>
 
-            <!-- BTS Card (Qty) -->
-            <div class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                <h3 class="text-base font-bold text-gray-800 mb-2">BTS</h3>
-                <div class="flex space-x-2">
+            <!-- BTS Card (Qty) --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">BTS</h3>
+                <div class="flex space-x-4">
                     <div class="w-1/2">
-                        <label for="btsTarget" class="block text-xs font-medium text-gray-500 mb-1">Target (Qty)</label>
+                        <label for="btsTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                         <input type="number" id="btsTarget" data-category="bts" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-2 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-red-600">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
-                        <label for="btsActual" class="block text-xs font-medium text-gray-500 mb-1">Actual (Qty)</label>
+                        <label for="btsActual" class="block text-xs font-medium text-gray-600 mb-2">Actual (Qty)</label>
                         <input type="number" id="btsActual" data-category="bts" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-2 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-red-600">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-blue-500 shadow-inner">
                     </div>
                 </div>
             </div>
 
-            <!-- VAF Card ($) -->
-            <div class="p-4 bg-red-200 rounded-xl shadow-md border border-red-400">
-                <h3 class="text-base font-bold text-red-900 mb-2">VAF (Dollar Based)</h3>
-                <div class="flex space-x-2">
+            <!-- VAF Card ($) --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-cyan-700 mb-4">VAF (Dollar Based)</h3>
+                <div class="flex space-x-4">
                     <div class="w-1/2">
-                        <label for="vafTarget" class="block text-xs font-medium text-red-800 mb-1">Target ($)</label>
+                        <label for="vafTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                         <input type="number" id="vafTarget" data-category="vaf" value="19" min="1" oninput="calculateCommission()"
-                               class="w-full p-2 border border-red-600 rounded-lg text-sm transition duration-150 focus:border-red-800">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
-                        <label for="vafActual" class="block text-xs font-medium text-red-800 mb-1">Actual ($)</label>
+                        <label for="vafActual" class="block text-xs font-medium text-gray-600 mb-2">Actual ($)</label>
                         <input type="number" id="vafActual" data-category="vaf" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-2 border border-red-600 rounded-lg text-sm transition duration-150 focus:border-red-800">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                 </div>
             </div>
 
-            <!-- Accessories Card ($) -->
-            <div class="p-4 bg-red-200 rounded-xl shadow-md border border-red-400">
-                <h3 class="text-base font-bold text-red-900 mb-2">Accessories (Dollar Based)</h3>
-                <div class="flex space-x-2">
+            <!-- Accessories Card ($) --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-cyan-700 mb-4">Accessories (Dollar Based)</h3>
+                <div class="flex space-x-4">
                     <div class="w-1/2">
-                        <label for="accessoriesTarget" class="block text-xs font-medium text-red-800 mb-1">Target ($)</label>
+                        <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                         <input type="number" id="accessoriesTarget" data-category="accessories" value="" min="1" oninput="calculateCommission()"
-                               class="w-full p-2 border border-red-600 rounded-lg text-sm transition duration-150 focus:border-red-800">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                     <div class="w-1/2">
-                        <label for="accessoriesActual" class="block text-xs font-medium text-red-800 mb-1">Actual ($)</label>
+                        <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 mb-2">Actual ($)</label>
                         <input type="number" id="accessoriesActual" data-category="accessories" value="" min="0" oninput="calculateCommission()"
-                               class="w-full p-2 border border-red-600 rounded-lg text-sm transition duration-150 focus:border-red-800">
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-sm transition duration-150 focus:border-cyan-500 shadow-inner">
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- Output Section -->
-        <div id="results" class="space-y-4">
-            <h2 class="text-xl font-semibold text-gray-800 border-b pb-2 mb-4">Payout Summary</h2>
+        <!-- Output Section --><div id="results" class="space-y-6">
+            <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-3 mb-6">Payout Summary</h2>
 
-            <!-- Detailed Payouts -->
-            <div id="payoutDetails" class="space-y-3">
-                <!-- Voice Payout Display -->
-                <div id="voiceResult" class="p-3 bg-white rounded-lg shadow-md border border-gray-100">
+            <div id="payoutDetails" class="space-y-4">
+                <!-- Voice Payout Display --><div id="voiceResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-700">Voice Payout</span>
-                        <span id="payoutVoice" class="text-lg font-extrabold text-red-700">$0.00</span>
+                        <span class="text-base font-semibold text-gray-700">Voice Payout</span>
+                        <span id="payoutVoice" class="text-xl font-extrabold text-blue-700">$0.00</span>
                     </div>
-                    <div class="text-right text-xs text-gray-500 mt-1">
+                    <div class="text-right text-xs text-gray-500 mt-2">
                         Goal: <span id="voiceGoal">Awaiting valid input...</span>
                     </div>
                 </div>
-                <!-- BTS Payout Display -->
-                <div id="btsResult" class="p-3 bg-white rounded-lg shadow-md border border-gray-100">
+                <!-- BTS Payout Display --><div id="btsResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-700">BTS Payout</span>
-                        <span id="payoutBTS" class="text-lg font-extrabold text-red-700">$0.00</span>
+                        <span class="text-base font-semibold text-gray-700">BTS Payout</span>
+                        <span id="payoutBTS" class="text-xl font-extrabold text-blue-700">$0.00</span>
                     </div>
-                    <div class="text-right text-xs text-gray-500 mt-1">
+                    <div class="text-right text-xs text-gray-500 mt-2">
                         Goal: <span id="btsGoal">Awaiting valid input...</span>
                     </div>
                 </div>
-                <!-- VAF Payout Display -->
-                <div id="vafResult" class="p-3 bg-white rounded-lg shadow-md border border-gray-100">
+                <!-- VAF Payout Display --><div id="vafResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-700">VAF Payout</span>
-                        <span id="payoutVAF" class="text-lg font-extrabold text-red-700">$0.00</span>
+                        <span class="text-base font-semibold text-gray-700">VAF Payout</span>
+                        <span id="payoutVAF" class="text-xl font-extrabold text-blue-700">$0.00</span>
                     </div>
-                    <div class="text-right text-xs text-gray-500 mt-1">
+                    <div class="text-right text-xs text-gray-500 mt-2">
                         Goal: <span id="vafGoal">Awaiting valid input...</span>
                     </div>
                 </div>
-                <!-- Accessories Payout Display -->
-                <div id="accessoriesResult" class="p-3 bg-white rounded-lg shadow-md border border-gray-100">
+                <!-- Accessories Payout Display --><div id="accessoriesResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
                     <div class="flex justify-between items-center">
-                        <span class="text-sm font-bold text-gray-700">Accessories Payout</span>
-                        <span id="payoutAccessories" class="text-lg font-extrabold text-red-700">$0.00</span>
+                        <span class="text-base font-semibold text-gray-700">Accessories Payout</span>
+                        <span id="payoutAccessories" class="text-xl font-extrabold text-blue-700">$0.00</span>
                     </div>
-                    <div class="text-right text-xs text-gray-500 mt-1">
+                    <div class="text-right text-xs text-gray-500 mt-2">
                         Goal: <span id="accessoriesGoal">Awaiting valid input...</span>
                     </div>
                 </div>
             </div>
 
-            <!-- Total Base Commission -->
-            <div class="flex justify-between items-center p-4 bg-gray-200 rounded-xl mt-6">
-                <p class="text-base font-semibold text-gray-700">Total Base Commission</p>
-                <p id="totalBaseCommission" class="text-xl font-extrabold text-gray-800">$0.00</p>
+            <!-- Total Base Commission --><div class="flex justify-between items-center p-6 bg-gray-100 rounded-xl shadow-md mt-8">
+                <p class="text-lg font-bold text-gray-700">Total Base Commission</p>
+                <p id="totalBaseCommission" class="text-2xl font-extrabold text-gray-800">$0.00</p>
             </div>
 
-            <!-- Final Payout (with Accelerator) -->
-            <div class="flex justify-between items-center p-4 bg-red-500 rounded-2xl shadow-xl border-b-4 border-red-700">
-                <p class="text-lg font-extrabold text-white">FINAL PAYOUT</p>
-                <p id="finalPayout" class="text-3xl font-extrabold text-yellow-100">$0.00</p>
+            <!-- Final Payout (with Accelerator) - High Contrast --><div class="flex justify-between items-center p-8 bg-gray-800 rounded-2xl shadow-2xl border-b-4 border-cyan-500 transition duration-300">
+                <p class="text-2xl font-black text-white tracking-wider">FINAL PAYOUT</p>
+                <p id="finalPayout" class="text-5xl font-black text-cyan-400">$0.00</p>
             </div>
         </div>
 
@@ -201,8 +184,8 @@
         ];
         const MIN_CAP = 0.80; // 80% minimum payout
         const MAX_CAP = 1.25; // 125% maximum payout
-        const ACCELERATOR_MIN = -45; // New minimum
-        const ACCELERATOR_MAX = 45;  // New maximum
+        const ACCELERATOR_MIN = -45; 
+        const ACCELERATOR_MAX = 45;  
 
         // Tier definitions for Max Payouts based on Net GP MTD
         const GP_TIERS = [
@@ -245,7 +228,7 @@
             // Iterate through the tiers to find the match
             for (const tier of GP_TIERS) {
                 if (netGpMtd >= tier.min && netGpMtd <= tier.max) {
-                    statusElement.innerHTML = `<span class="text-green-700 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
+                    statusElement.innerHTML = `<span class="text-cyan-700 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
                     return tier.rates;
                 }
             }
@@ -291,7 +274,7 @@
                 if (isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || categoryMax === 0) {
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
-                    payoutElement.classList.remove('text-red-700', 'text-green-700', 'text-gray-700');
+                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
                     payoutElement.classList.add('text-red-700'); 
                     
                     let statusText = 'Awaiting valid input...';
@@ -342,13 +325,13 @@
 
 
                 // Color coding for individual payout
-                payoutElement.classList.remove('text-red-700', 'text-green-700', 'text-gray-700');
+                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
                 if (percentageToGoal < MIN_CAP) {
                     payoutElement.classList.add('text-red-700'); // Below minimum
                 } else if (percentageToGoal >= 1) {
-                    payoutElement.classList.add('text-green-700'); // At or above 100%
+                    payoutElement.classList.add('text-green-600'); // At or above 100%
                 } else {
-                    payoutElement.classList.add('text-gray-700'); // Between 80% and 100%
+                    payoutElement.classList.add('text-blue-700'); // Between 80% and 100%
                 }
             }
 
@@ -376,13 +359,13 @@
             document.getElementById('finalPayout').textContent = formatCurrency(finalPayout);
             
             // Color coding for final payout based on accelerator
-            document.getElementById('finalPayout').classList.remove('text-red-300', 'text-green-300', 'text-yellow-100');
+            document.getElementById('finalPayout').classList.remove('text-red-500', 'text-green-500', 'text-cyan-400');
             if (acceleratorPercent < 0) {
-                 document.getElementById('finalPayout').classList.add('text-red-300');
+                 document.getElementById('finalPayout').classList.add('text-red-500');
             } else if (acceleratorPercent > 0) {
-                 document.getElementById('finalPayout').classList.add('text-green-300');
+                 document.getElementById('finalPayout').classList.add('text-green-500');
             } else {
-                 document.getElementById('finalPayout').classList.add('text-yellow-100');
+                 document.getElementById('finalPayout').classList.add('text-cyan-400'); // Neutral color for 0% acceleration
             }
         }
 
