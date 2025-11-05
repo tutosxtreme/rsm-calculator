@@ -21,6 +21,10 @@
         input[type="number"] {
             -moz-appearance: textfield; /* Firefox */
         }
+        /* NEW: Custom text-shadow class */
+        .text-shadow {
+             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+        }
     </style>
 </head>
 <body class="min-h-screen p-6 flex flex-col items-center justify-center overflow-x-hidden">
@@ -86,6 +90,22 @@
                 </div>
             </div>
 
+            <!-- Rotating Metric Card (Qty) - MOVED UP --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Rotating Metric</h3>
+                <div class="flex space-x-4">
+                    <div class="w-1/2">
+                        <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
+                        <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" value="" min="1" oninput="calculateCommission()"
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
+                    </div>
+                    <div class="w-1/2">
+                        <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 mb-2">Actual (Qty)</label>
+                        <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" value="" min="0" oninput="calculateCommission()"
+                               class="w-full p-3 bg-gray-50 border border-gray-300 rounded-lg text-base transition duration-150 focus:border-blue-500 shadow-inner">
+                    </div>
+                </div>
+            </div>
+
             <!-- VAF Card ($) --><div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                 <h3 class="text-lg font-bold text-cyan-700 mb-4">VAF (Dollar Based)</h3>
                 <div class="flex space-x-4">
@@ -120,44 +140,40 @@
         </div>
         
         <!-- Output Section --><div id="results" class="space-y-6">
-            <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-3 mb-6">Payout Summary</h2>
+            <!-- UPDATED: Added text-shadow class -->
+            <h2 class="text-2xl font-bold text-gray-800 border-b border-gray-200 pb-3 mb-6 text-shadow">Payout Summary</h2>
 
-            <div id="payoutDetails" class="space-y-4">
-                <!-- Voice Payout Display --><div id="voiceResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <span class="text-base font-semibold text-gray-700">Voice Payout</span>
-                        <span id="payoutVoice" class="text-xl font-extrabold text-blue-700">$0.00</span>
-                    </div>
-                    <div class="text-right text-xs text-gray-500 mt-2">
-                        Goal: <span id="voiceGoal">Awaiting valid input...</span>
-                    </div>
+            <!-- COMPACT GRID LAYOUT -->
+            <div id="payoutDetails" class="grid grid-cols-2 gap-4"> 
+
+                <!-- Voice Payout Display --><div id="voiceResult" class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-semibold text-gray-700 block truncate">Voice</span>
+                    <span id="payoutVoice" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                    <span id="voiceGoal" class="text-xs text-gray-500 block mt-1 truncate">Awaiting valid input...</span>
                 </div>
-                <!-- BTS Payout Display --><div id="btsResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <span class="text-base font-semibold text-gray-700">BTS Payout</span>
-                        <span id="payoutBTS" class="text-xl font-extrabold text-blue-700">$0.00</span>
-                    </div>
-                    <div class="text-right text-xs text-gray-500 mt-2">
-                        Goal: <span id="btsGoal">Awaiting valid input...</span>
-                    </div>
+                
+                <!-- BTS Payout Display --><div id="btsResult" class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-semibold text-gray-700 block truncate">BTS</span>
+                    <span id="payoutBTS" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                    <span id="btsGoal" class="text-xs text-gray-500 block mt-1 truncate">Awaiting valid input...</span>
                 </div>
-                <!-- VAF Payout Display --><div id="vafResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <span class="text-base font-semibold text-gray-700">VAF Payout</span>
-                        <span id="payoutVAF" class="text-xl font-extrabold text-blue-700">$0.00</span>
-                    </div>
-                    <div class="text-right text-xs text-gray-500 mt-2">
-                        Goal: <span id="vafGoal">Awaiting valid input...</span>
-                    </div>
+                
+                <!-- Rotating Metric Payout Display --><div id="rotatingmetricResult" class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-semibold text-gray-700 block truncate">Rotating Metric</span>
+                    <span id="payoutRotatingMetric" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                    <span id="rotatingmetricGoal" class="text-xs text-gray-500 block mt-1 truncate">Awaiting valid input...</span>
                 </div>
-                <!-- Accessories Payout Display --><div id="accessoriesResult" class="p-5 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <span class="text-base font-semibold text-gray-700">Accessories Payout</span>
-                        <span id="payoutAccessories" class="text-xl font-extrabold text-blue-700">$0.00</span>
-                    </div>
-                    <div class="text-right text-xs text-gray-500 mt-2">
-                        Goal: <span id="accessoriesGoal">Awaiting valid input...</span>
-                    </div>
+                
+                <!-- VAF Payout Display --><div id="vafResult" class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-semibold text-gray-700 block truncate">VAF</span>
+                    <span id="payoutVAF" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                    <span id="vafGoal" class="text-xs text-gray-500 block mt-1 truncate">Awaiting valid input...</span>
+                </div>
+                
+                <!-- Accessories Payout Display --><div id="accessoriesResult" class="p-4 bg-gray-50 rounded-xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-semibold text-gray-700 block truncate">Accessories</span>
+                    <span id="payoutAccessories" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                    <span id="accessoriesGoal" class="text-xs text-gray-500 block mt-1 truncate">Awaiting valid input...</span>
                 </div>
             </div>
 
@@ -180,10 +196,12 @@
         const CATEGORIES = [
             { name: 'Voice', id: 'voice' },
             { name: 'BTS', id: 'bts' },
+            { name: 'Rotating Metric', id: 'rotatingmetric' }, // MOVED UP
             { name: 'VAF', id: 'vaf' },
             { name: 'Accessories', id: 'accessories' },
         ];
         const MIN_CAP = 0.80; // 80% minimum payout threshold
+        const ORANGE_CAP = 0.90; // NEW: 90% boundary for orange color
         const MAX_CAP = 1.25; // 125% maximum payout
         const ACCELERATOR_MIN = -45; 
         const ACCELERATOR_MAX = 45;  
@@ -191,19 +209,19 @@
         // Tier definitions for Max Payouts based on Net GP MTD
         const GP_TIERS = [
             // Tier 0: Less than $11,000 (0 - 10,999)
-            { min: 0, max: 10999, label: 'Tier 0 (Below $11,000)', rates: { voice: 150, bts: 75, vaf: 75, accessories: 50 } },
+            { min: 0, max: 10999, label: 'Tier 0 (Below $11,000)', rates: { voice: 150, bts: 75, vaf: 75, accessories: 50, rotatingmetric: 50 } },
             // Tier 1: 11k - 20,999
-            { min: 11000, max: 20999, label: 'Tier 1 ($11,000 - $20,999)', rates: { voice: 375, bts: 175, vaf: 100, accessories: 75 } },
+            { min: 11000, max: 20999, label: 'Tier 1 ($11,000 - $20,999)', rates: { voice: 375, bts: 175, vaf: 100, accessories: 75, rotatingmetric: 75 } },
             // Tier 2: 21k - 30,999
-            { min: 21000, max: 30999, label: 'Tier 2 ($21,000 - $30,999)', rates: { voice: 600, bts: 300, vaf: 175, accessories: 150 } },
+            { min: 21000, max: 30999, label: 'Tier 2 ($21,000 - $30,999)', rates: { voice: 600, bts: 300, vaf: 175, accessories: 150, rotatingmetric: 100 } },
             // Tier 3: 31k - 45,999
-            { min: 31000, max: 45999, label: 'Tier 3 ($31,000 - $45,999)', rates: { voice: 800, bts: 400, vaf: 250, accessories: 225 } },
+            { min: 31000, max: 45999, label: 'Tier 3 ($31,000 - $45,999)', rates: { voice: 800, bts: 400, vaf: 250, accessories: 225, rotatingmetric: 200 } },
             // Tier 4: 46k - 60,999
-            { min: 46000, max: 60999, label: 'Tier 4 ($46,000 - $60,999)', rates: { voice: 1000, bts: 500, vaf: 325, accessories: 300 } },
+            { min: 46000, max: 60999, label: 'Tier 4 ($46,000 - $60,999)', rates: { voice: 1000, bts: 500, vaf: 325, accessories: 300, rotatingmetric: 250 } },
             // Tier 5: 61k - 80,999
-            { min: 61000, max: 80999, label: 'Tier 5 ($61,000 - $80,999)', rates: { voice: 1200, bts: 600, vaf: 500, accessories: 450 } },
+            { min: 61000, max: 80999, label: 'Tier 5 ($61,000 - $80,999)', rates: { voice: 1200, bts: 600, vaf: 500, accessories: 450, rotatingmetric: 400 } },
             // Tier 6: 81k and up
-            { min: 81000, max: 99999999, label: 'Tier 6 ($81,000+)', rates: { voice: 1400, bts: 800, vaf: 650, accessories: 600 } },
+            { min: 81000, max: 99999999, label: 'Tier 6 ($81,000+)', rates: { voice: 1400, bts: 800, vaf: 650, accessories: 600, rotatingmetric: 500 } },
         ];
 
         // Utility function to format numbers as currency
@@ -218,7 +236,7 @@
 
         // Function to determine the max payout based on Net GP MTD
         function getMaxPayouts(netGpMtd) {
-            const defaultRates = { voice: 0, bts: 0, vaf: 0, accessories: 0 };
+            const defaultRates = { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 };
             const statusElement = document.getElementById('tierStatus');
 
             if (isNaN(netGpMtd) || netGpMtd < 0) { // Check for valid non-negative input
@@ -265,7 +283,7 @@
                 const target = parseFloat(targetInput.value);
                 const actual = parseFloat(actualInput.value); 
 
-                const payoutElement = document.getElementById(`payout${category.name}`);
+                const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); // Clean up ID for 'Rotating Metric'
                 const goalElement = document.getElementById(`${category.id}Goal`);
                 
                 // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
@@ -275,14 +293,15 @@
                 if (isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || categoryMax === 0) {
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
-                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
+                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); // Ensure new class is removed
                     payoutElement.classList.add('text-red-700'); 
                     
                     let statusText = 'Awaiting valid input...';
                     if (categoryMax === 0 && !isNaN(netGpMtd) && netGpMtd > 0) {
                         statusText = 'GP MTD tier not met.';
                     }
-                    goalElement.textContent = statusText;
+                    // Updated for compact display
+                    goalElement.textContent = `Goal: ${statusText}`;
                     continue; // Skip calculation for this invalid category
                 }
                 
@@ -322,16 +341,21 @@
                 } else {
                     goalText += ` (${capStatus})`;
                 }
-                goalElement.textContent = goalText;
+                // Updated for compact display
+                goalElement.textContent = `Goal: ${goalText}`;
 
 
                 // Color coding for individual payout
-                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
+                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); // Clean all color classes
+                
                 if (percentageToGoal < MIN_CAP) {
                     // Payout is $0.00 (below 80% threshold)
                     payoutElement.classList.add('text-red-700'); 
+                } else if (percentageToGoal < ORANGE_CAP) { 
+                    // NEW: Between 80% and 90% (exclusive of 90%)
+                    payoutElement.classList.add('text-orange-500');
                 } else {
-                    // Payout is greater than $1.00 (any non-zero payout satisfies this condition)
+                    // Payout is greater than or equal to 90%
                     payoutElement.classList.add('text-green-600');
                 }
             }
