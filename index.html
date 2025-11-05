@@ -46,10 +46,9 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3">Inputs</h2>
 
                 <!-- Store's Net Gross Profit Input -->
-                <!-- UPDATED: Added md:p-4 for smaller container padding in landscape -->
+                <!-- Smaller container padding and input text size for landscape (md:) -->
                 <div class="bg-gray-50 p-6 md:p-4 rounded-xl shadow-2xl mb-6 border-l-4 border-cyan-500">
                     <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 mb-3">Store’s Net Gross Profit ($)</label>
-                    <!-- UPDATED: Added md:p-3 for smaller input padding and md:text-xl for smaller font in landscape -->
                     <input type="number" id="netGpMtdInput" value="" min="0" oninput="calculateCommission()"
                            class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition duration-150 shadow-inner"
                            placeholder="Enter Gross Profit">
@@ -59,12 +58,12 @@
                 </div>
 
                 <!-- Accelerator Input -->
-                <!-- UPDATED: Added md:p-4 for smaller container padding in landscape -->
+                <!-- Smaller container padding and input text size for landscape (md:) -->
                 <div class="bg-gray-50 p-6 md:p-4 rounded-xl shadow-2xl mb-8 border-l-4 border-red-500">
                     <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 mb-3">Accelerator / Decelerator (%)</label>
-                    <!-- UPDATED: Added md:p-3 for smaller input padding and md:text-xl for smaller font in landscape -->
+                    <!-- text-gray-800 is now the permanent color for the input text -->
                     <input type="number" id="acceleratorInput" value="" min="-45" max="45" step="1" oninput="calculateCommission()"
-                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 transition duration-150 shadow-inner"
+                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 transition duration-150 shadow-inner text-gray-800"
                            placeholder="0">
                     <p class="text-xs text-red-600 mt-2 text-center">Range: -45% to +45%.</p>
                     <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 p-3 rounded-xl mt-4 shadow-lg hidden" role="alert">
@@ -80,7 +79,8 @@
                     <!-- Voice Card (Qty) -->
                     <div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Voice</h3>
-                        <div class="flex space-space-x-4">
+                        <!-- Increased space-x-4 to space-x-6 for better spacing -->
+                        <div class="flex space-x-6"> 
                             <div class="w-1/2">
                                 <label for="voiceTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                                 <input type="number" id="voiceTarget" data-category="voice" value="" min="1" oninput="calculateCommission()"
@@ -97,7 +97,8 @@
                     <!-- BTS Card (Qty) -->
                     <div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">BTS</h3>
-                        <div class="flex space-x-4">
+                        <!-- Increased space-x-4 to space-x-6 for better spacing -->
+                        <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="btsTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                                 <input type="number" id="btsTarget" data-category="bts" value="" min="1" oninput="calculateCommission()"
@@ -114,7 +115,8 @@
                     <!-- Rotating Metric Card (Qty) -->
                     <div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Rotating Metric</h3>
-                        <div class="flex space-x-4">
+                        <!-- Increased space-x-4 to space-x-6 for better spacing -->
+                        <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 mb-2">Target (Qty)</label>
                                 <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" value="" min="1" oninput="calculateCommission()"
@@ -131,7 +133,8 @@
                     <!-- VAF Card ($) -->
                     <div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-cyan-700 mb-4">VAF (Dollar Based)</h3>
-                        <div class="flex space-x-4">
+                        <!-- Increased space-x-4 to space-x-6 for better spacing -->
+                        <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="vafTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                                 <input type="number" id="vafTarget" data-category="vaf" value="19" min="1" oninput="calculateCommission()"
@@ -148,7 +151,8 @@
                     <!-- Accessories Card ($) -->
                     <div class="p-6 bg-white rounded-xl shadow-md border border-gray-100">
                         <h3 class="text-lg font-bold text-cyan-700 mb-4">Accessories (Dollar Based)</h3>
-                        <div class="flex space-x-4">
+                        <!-- Increased space-x-4 to space-x-6 for better spacing -->
+                        <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 mb-2">Target ($)</label>
                                 <input type="number" id="accessoriesTarget" data-category="accessories" value="" min="1" oninput="calculateCommission()"
@@ -217,7 +221,7 @@
 
                     <!-- Final Payout (with Accelerator) - High Contrast -->
                     <div class="flex justify-between items-center p-8 bg-gray-800 rounded-2xl shadow-2xl border-b-4 border-cyan-500 transition duration-300">
-                        <!-- MODIFIED: Stack FINAL and PAYOUT vertically for better landscape readability -->
+                        <!-- FINAL PAYOUT label stacked vertically for landscape optimization -->
                         <div class="flex flex-col text-white font-black tracking-wider text-left">
                             <span class="text-xl md:text-2xl leading-none">FINAL</span>
                             <span class="text-xl md:text-2xl leading-none">PAYOUT</span>
@@ -314,6 +318,10 @@
             
             let totalBaseCommission = 0;
 
+            // The accelerator input color logic has been removed as requested.
+            // The input will now use the default 'text-gray-800' class defined in the HTML.
+
+
             // --- Loop through each category for calculation ---
             for (const category of CATEGORIES) {
                 const targetInput = document.getElementById(`${category.id}Target`);
@@ -333,7 +341,7 @@
                 if (isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || categoryMax === 0) {
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
-                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); // Ensure new class is removed
+                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); 
                     payoutElement.classList.add('text-red-700'); 
                     
                     let statusText = 'Awaiting valid input...';
@@ -423,7 +431,7 @@
             // Update Final Payout display
             document.getElementById('finalPayout').textContent = formatCurrency(finalPayout);
             
-            // Color coding for final payout based on accelerator
+            // Color coding for final payout based on accelerator (kept this logic)
             document.getElementById('finalPayout').classList.remove('text-red-500', 'text-green-500', 'text-cyan-400');
             if (acceleratorPercent < 0) {
                  document.getElementById('finalPayout').classList.add('text-red-500');
