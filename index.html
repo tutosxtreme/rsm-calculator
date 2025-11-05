@@ -46,10 +46,12 @@
                 <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b border-gray-200 pb-3">Inputs</h2>
 
                 <!-- Store's Net Gross Profit Input -->
-                <div class="bg-gray-50 p-6 rounded-xl shadow-2xl mb-6 border-l-4 border-cyan-500">
+                <!-- UPDATED: Added md:p-4 for smaller container padding in landscape -->
+                <div class="bg-gray-50 p-6 md:p-4 rounded-xl shadow-2xl mb-6 border-l-4 border-cyan-500">
                     <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 mb-3">Store’s Net Gross Profit ($)</label>
+                    <!-- UPDATED: Added md:p-3 for smaller input padding and md:text-xl for smaller font in landscape -->
                     <input type="number" id="netGpMtdInput" value="" min="0" oninput="calculateCommission()"
-                           class="w-full p-4 text-2xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition duration-150 shadow-inner"
+                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-cyan-500 focus:ring-cyan-500 transition duration-150 shadow-inner"
                            placeholder="Enter Gross Profit">
                     <div id="tierStatus" class="text-xs text-cyan-600 mt-4 text-center font-medium">
                         Payout rates based on the amount above.
@@ -57,10 +59,12 @@
                 </div>
 
                 <!-- Accelerator Input -->
-                <div class="bg-gray-50 p-6 rounded-xl shadow-2xl mb-8 border-l-4 border-red-500">
+                <!-- UPDATED: Added md:p-4 for smaller container padding in landscape -->
+                <div class="bg-gray-50 p-6 md:p-4 rounded-xl shadow-2xl mb-8 border-l-4 border-red-500">
                     <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 mb-3">Accelerator / Decelerator (%)</label>
+                    <!-- UPDATED: Added md:p-3 for smaller input padding and md:text-xl for smaller font in landscape -->
                     <input type="number" id="acceleratorInput" value="" min="-45" max="45" step="1" oninput="calculateCommission()"
-                           class="w-full p-4 text-2xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 transition duration-150 shadow-inner"
+                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white border border-gray-300 rounded-lg focus:border-red-500 focus:ring-red-500 transition duration-150 shadow-inner"
                            placeholder="0">
                     <p class="text-xs text-red-600 mt-2 text-center">Range: -45% to +45%.</p>
                     <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 p-3 rounded-xl mt-4 shadow-lg hidden" role="alert">
@@ -214,8 +218,8 @@
                     <!-- Final Payout (with Accelerator) - High Contrast -->
                     <div class="flex justify-between items-center p-8 bg-gray-800 rounded-2xl shadow-2xl border-b-4 border-cyan-500 transition duration-300">
                         <p class="text-xl md:text-2xl font-black text-white tracking-wider">FINAL PAYOUT</p>
-                        <!-- FIX: Changed md:text-5xl to md:text-4xl to prevent overflow in landscape mode -->
-                        <p id="finalPayout" class="text-3xl sm:text-4xl md:text-4xl lg:text-5xl font-black text-cyan-400">$0.00</p>
+                        <!-- Payout font size previously adjusted for landscape: md:text-3xl -->
+                        <p id="finalPayout" class="text-3xl sm:text-4xl md:text-3xl lg:text-5xl font-black text-cyan-400">$0.00</p>
                     </div>
                 </div>
             </div>
