@@ -328,11 +328,11 @@
                 // Color coding for individual payout
                 payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700');
                 if (percentageToGoal < MIN_CAP) {
-                    payoutElement.classList.add('text-red-700'); // Below minimum (now zero payout)
-                } else if (percentageToGoal >= 1) {
-                    payoutElement.classList.add('text-green-600'); // At or above 100%
+                    // Payout is $0.00 (below 80% threshold)
+                    payoutElement.classList.add('text-red-700'); 
                 } else {
-                    payoutElement.classList.add('text-blue-700'); // Between 80% and 100%
+                    // Payout is greater than $1.00 (any non-zero payout satisfies this condition)
+                    payoutElement.classList.add('text-green-600');
                 }
             }
 
