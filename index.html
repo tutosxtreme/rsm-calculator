@@ -11,28 +11,36 @@
         body {
             font-family: 'Inter', sans-serif;
             /* Default Light Mode Styles */
-            background-color: #f8fafc; 
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4f9 100%); /* Subtle gradient */
             color: #334155; 
         }
         /* Dark Mode Styles (Deeper, More Contrast) */
         @media (prefers-color-scheme: dark) {
             body {
-                background-color: #020617; /* Very deep blue-gray (Gray-950 equivalent) */
+                background: linear-gradient(135deg, #020617 0%, #0f172a 100%); /* Subtle dark gradient */
                 color: #e5e7eb; /* Tailwind gray-200 for general body text */
             }
         }
         /* Custom shadow for a modern dark-mode glow on key elements */
         .dark-glow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); /* Default shadow */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            transition: box-shadow 0.3s ease-in-out;
         }
         @media (prefers-color-scheme: dark) {
-            .dark-glow {
-                /* Subtle cyan glow for a modern, raised dark element */
-                box-shadow: 0 0px 15px rgba(6, 182, 212, 0.15), 0 0px 5px rgba(6, 182, 212, 0.1); 
+             .dark-glow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
             }
         }
 
-        /* Hide number input spin buttons */
+        /* Input focus style: a clear cyan ring for usability */
+        .input-focus-cyan:focus {
+            outline: none;
+            border-color: #06b6d4 !important; /* Cyan-500 */
+            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.5); /* Cyan ring */
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+
+        /* Hide number input spin buttons for a cleaner look */
         input[type="number"]::-webkit-inner-spin-button,
         input[type="number"]::-webkit-outer-spin-button {
             -webkit-appearance: none;
@@ -40,46 +48,72 @@
         }
         input[type="number"] {
             -moz-appearance: textfield; /* Firefox */
+            transition: all 0.2s ease-in-out; /* Add transition for hover effect */
         }
-        /* Custom text-shadow class */
-        .text-shadow {
-             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+
+        /* NEW: Input hover bounce effect */
+        input[type="number"]:hover:not(:focus) { /* Don't apply when focused to avoid conflict */
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        @media (prefers-color-scheme: dark) {
+            input[type="number"]:hover:not(:focus) {
+                box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15); /* Brighter glow on hover */
+            }
+        }
+
+        /* NEW: Gradient text class for header */
+        .gradient-text {
+            background: linear-gradient(90deg, #0ea5e9 0%, #4f46e5 100%); /* Sky-500 to Indigo-600 */
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-fill-color: transparent;
+        }
+        @media (prefers-color-scheme: dark) {
+            .gradient-text {
+                background: linear-gradient(90deg, #06b6d4 0%, #818cf8 100%); /* Cyan-500 to Indigo-300 */
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                text-fill-color: transparent;
+            }
         }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-6 flex flex-col items-center justify-center overflow-x-hidden transition-colors duration-300">
+<body class="min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center overflow-x-hidden transition-colors duration-300">
 
-    <!-- Main Calculator Panel - Background is the second layer (gray-900) -->
-    <div id="app" class="w-full max-w-xl md:max-w-6xl lg:max-w-7xl bg-white dark:bg-gray-900 p-6 md:p-10 shadow-3xl rounded-2xl transition-all duration-300">
+    <!-- Main Calculator Panel - Large Rounded Container -->
+    <div id="app" class="w-full max-w-xl md:max-w-6xl lg:max-w-7xl bg-white dark:bg-gray-900 p-6 md:p-10 shadow-2xl rounded-3xl dark-glow transition-all duration-300">
         
-        <!-- Header - Always full width -->
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-gray-50 mb-8 md:mb-10 text-center border-b border-gray-200 dark:border-gray-700 pb-5">
+        <!-- Header -->
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-gray-50 mb-8 md:mb-10 text-center border-b border-gray-200 dark:border-gray-700 pb-5 gradient-text">
             RSM Bonus Calculator
         </h1>
 
-        <!-- Content Area -->
+        <!-- Content Area: Two-column grid on desktop -->
         <div class="md:grid md:grid-cols-2 md:gap-12">
             
             <!-- COLUMN 1: Inputs -->
             <div>
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Inputs</h2>
 
-                <!-- Store's Net Gross Profit Input - Third Layer (gray-800) with GLOW -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-6 md:p-4 rounded-xl shadow-2xl dark-glow mb-6 border-l-4 border-cyan-500 transition-all duration-300 transform hover:scale-[1.01]">
-                    <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 dark:text-cyan-400 mb-3">Store’s Net Gross Profit ($)</label>
-                    <input type="number" id="netGpMtdInput" value="" min="0" oninput="calculateCommission()"
-                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white dark:bg-gray-900 dark:text-gray-50 border border-gray-300 dark:border-gray-700 rounded-lg focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 transition duration-150 shadow-inner"
+                <!-- Store's Net Gross Profit Input Card -->
+                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-6 transition-all duration-300">
+                    <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-3">Store’s Net Gross Profit (MTD) ($)</label>
+                    <input type="number" id="netGpMtdInput" min="0" oninput="calculateCommission()"
+                           class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
                            placeholder="Enter Gross Profit">
                     <div id="tierStatus" class="text-xs text-cyan-600 dark:text-cyan-400 mt-4 text-center font-medium">
-                        Payout rates based on the amount above.
+                        Awaiting valid GP MTD to determine max payouts.
                     </div>
                 </div>
 
-                <!-- Accelerator Input - Third Layer (gray-800) with GLOW -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-6 md:p-4 rounded-xl shadow-2xl dark-glow mb-8 border-l-4 border-red-500 transition-all duration-300 transform hover:scale-[1.01]">
-                    <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 dark:text-red-400 mb-3">Accelerator / Decelerator (%)</label>
-                    <input type="number" id="acceleratorInput" value="" min="-45" max="45" step="1" oninput="calculateCommission()"
-                           class="w-full p-4 md:p-3 text-2xl md:text-xl font-extrabold text-center bg-white dark:bg-gray-900 dark:text-gray-50 border border-gray-300 dark:border-gray-700 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-500 transition duration-150 shadow-inner text-gray-800"
+                <!-- Accelerator Input Card -->
+                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-8 transition-all duration-300">
+                    <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 dark:text-red-300 mb-3">Accelerator / Decelerator (%)</label>
+                    <input type="number" id="acceleratorInput" min="-45" max="45" step="1" oninput="calculateCommission()"
+                           class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
                            placeholder="0">
                     <p class="text-xs text-red-600 dark:text-red-400 mt-2 text-center">Range: -45% to +45%.</p>
                     <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 dark:bg-red-900/50 dark:text-red-300 p-3 rounded-xl mt-4 shadow-lg hidden" role="alert">
@@ -92,87 +126,88 @@
                 
                 <!-- Category Breakdown Inputs -->
                 <div id="categoryInputs" class="space-y-6 mb-8 md:mb-0">
-                    <!-- Cards use the white/gray-800 surface layer. Inputs are gray-900 (sunken) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-800/50 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Voice</h3>
+                    
+                    <!-- Voice Card (Qty) -->
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Voice (Qty)</h3>
                         <div class="flex space-x-6"> 
                             <div class="w-1/2">
-                                <label for="voiceTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Target (Qty)</label>
-                                <input type="number" id="voiceTarget" data-category="voice" value="" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="voiceTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <input type="number" id="voiceTarget" data-category="voice" min="1" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
-                                <label for="voiceActual" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Actual (Qty)</label>
-                                <input type="number" id="voiceActual" data-category="voice" value="" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="voiceActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <input type="number" id="voiceActual" data-category="voice" min="0" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
                     <!-- BTS Card (Qty) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-800/50 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">BTS</h3>
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">BTS (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
-                                <label for="btsTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Target (Qty)</label>
-                                <input type="number" id="btsTarget" data-category="bts" value="" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="btsTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <input type="number" id="btsTarget" data-category="bts" min="1" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
-                                <label for="btsActual" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Actual (Qty)</label>
-                                <input type="number" id="btsActual" data-category="bts" value="" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="btsActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <input type="number" id="btsActual" data-category="bts" min="0" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
                     <!-- Rotating Metric Card (Qty) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-800/50 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric</h3>
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
-                                <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Target (Qty)</label>
-                                <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" value="" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" min="1" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
-                                <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Actual (Qty)</label>
-                                <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" value="" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 shadow-inner">
+                                <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" min="0" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
                     <!-- VAF Card ($) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-800/50 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-400 mb-4">VAF (Dollar Based)</h3>
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-300 mb-4">VAF (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
-                                <label for="vafTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Target ($)</label>
-                                <input type="number" id="vafTarget" data-category="vaf" value="19" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 shadow-inner">
+                                <label for="vafTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
+                                <input type="number" id="vafTarget" data-category="vaf" min="1" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
-                                <label for="vafActual" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Actual ($)</label>
-                                <input type="number" id="vafActual" data-category="vaf" value="" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 shadow-inner">
+                                <label for="vafActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
+                                <input type="number" id="vafActual" data-category="vaf" min="0" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
                     <!-- Accessories Card ($) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-800/50 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-400 mb-4">Accessories (Dollar Based)</h3>
+                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-300 mb-4">Accessories (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
-                                <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Target ($)</label>
-                                <input type="number" id="accessoriesTarget" data-category="accessories" value="" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 shadow-inner">
+                                <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
+                                <input type="number" id="accessoriesTarget" data-category="accessories" min="1" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
-                                <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Actual ($)</label>
-                                <input type="number" id="accessoriesActual" data-category="accessories" value="" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 border border-gray-300 dark:border-gray-700 rounded-lg text-base transition duration-150 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500 shadow-inner">
+                                <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
+                                <input type="number" id="accessoriesActual" data-category="accessories" min="0" oninput="calculateCommission()"
+                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
@@ -182,83 +217,55 @@
             <!-- COLUMN 2: Outputs (Payout Summary) -->
             <div>
                 <!-- Output Section -->
-                <div id="results" class="space-y-6">
+                <div id="results" class="space-y-6 md:pt-[5.5rem]">
                     <!-- Payout Summary Header -->
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-700 pb-3 mb-6 text-shadow">Payout Summary</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Payout Summary</h2>
 
-                    <!-- COMPACT GRID LAYOUT - Third Layer (gray-800) -->
+                    <!-- COMPACT GRID LAYOUT -->
                     <div id="payoutDetails" class="grid grid-cols-2 gap-4"> 
-                        <!-- Voice Payout Display -->
-                        <div id="voiceResult" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 transition-colors duration-300">
+                        
+                        <!-- Payout Display Cards -->
+                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Voice</span>
-                            <span id="payoutVoice" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                            <span id="payoutVoice" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="voiceGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="voiceProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
-                        <!-- BTS Payout Display -->
-                        <div id="btsResult" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 transition-colors duration-300">
+                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">BTS</span>
-                            <span id="payoutBTS" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                            <span id="payoutBTS" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="btsGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="btsProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
-                        <!-- Rotating Metric Payout Display -->
-                        <div id="rotatingmetricResult" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 transition-colors duration-300">
+                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Rotating Metric</span>
-                            <span id="payoutRotatingMetric" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                            <span id="payoutRotatingMetric" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="rotatingmetricGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="rotatingmetricProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
-                        <!-- VAF Payout Display -->
-                        <div id="vafResult" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 transition-colors duration-300">
+                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">VAF</span>
-                            <span id="payoutVAF" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                            <span id="payoutVAF" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="vafGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="vafProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
-                        <!-- Accessories Payout Display -->
-                        <div id="accessoriesResult" class="p-4 bg-gray-50 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700/50 transition-colors duration-300">
+                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Accessories</span>
-                            <span id="payoutAccessories" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
+                            <span id="payoutAccessories" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="accessoriesGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="accessoriesProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                     </div>
 
-                    <!-- Total Base Commission - Third Layer (gray-800) -->
+                    <!-- Total Base Commission -->
                     <div class="flex justify-between items-center p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md mt-8 transition-colors duration-300">
                         <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Total Base Commission</p>
                         <p id="totalBaseCommission" class="text-2xl font-extrabold text-gray-800 dark:text-gray-100">$0.00</p>
                     </div>
 
-                    <!-- Final Payout (with Accelerator) - Darkest layer (gray-950) with GLOW -->
-                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-gray-800 dark:bg-gray-950 rounded-2xl shadow-2xl dark-glow border-b-4 border-cyan-500 transition-all duration-300 transform hover:scale-[1.01]">
-                        <!-- FINAL PAYOUT label stacked vertically for landscape optimization -->
-                        <div class="flex flex-col text-white font-black tracking-wider text-left">
-                            <span class="text-xl md:text-2xl leading-none">FINAL</span>
-                            <span class="text-xl md:text-2xl leading-none">PAYOUT</span>
-                        </div>
-                        <!-- Payout amount remains on the right -->
-                        <p id="finalPayout" class="text-3xl sm:text-4xl md:text-3xl lg:text-5xl font-black text-cyan-400">$0.00</p>
+                    <!-- Final Payout (with Accelerator) - Highlighting Card -->
+                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-white dark:bg-gray-900 border-4 border-cyan-500 rounded-2xl shadow-2xl transition-all duration-300">
+                        <p class="text-xl md:text-2xl font-black text-gray-700 dark:text-gray-50 tracking-wider">FINAL PAYOUT</p>
+                        <p id="finalPayout" class="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400">$0.00</p>
                     </div>
                 </div>
             </div>
@@ -299,6 +306,7 @@
             { min: 81000, max: 99999999, label: 'Tier 6 ($81,000+)', rates: { voice: 1400, bts: 800, vaf: 650, accessories: 600, rotatingmetric: 500 } },
         ];
 
+
         // Utility function to format numbers as currency
         const formatCurrency = (amount) => {
             return new Intl.NumberFormat('en-US', {
@@ -322,8 +330,8 @@
             // Iterate through the tiers to find the match
             for (const tier of GP_TIERS) {
                 if (netGpMtd >= tier.min && netGpMtd <= tier.max) {
-                    // Uses dark:text-cyan-400 for consistency
-                    statusElement.innerHTML = `<span class="text-cyan-700 dark:text-cyan-400 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
+                    // Uses dark:text-cyan-300 for consistency
+                    statusElement.innerHTML = `<span class="text-cyan-700 dark:text-cyan-300 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
                     return tier.rates;
                 }
             }
@@ -336,7 +344,8 @@
         // Main calculation function
         function calculateCommission() {
             const netGpMtdInput = document.getElementById('netGpMtdInput');
-            const netGpMtd = parseFloat(netGpMtdInput.value);
+            // Check for empty string and default to 0 for parsing (as it's a number input)
+            const netGpMtd = parseFloat(netGpMtdInput.value || 0);
 
             // Get dynamic max payouts based on Net GP MTD
             const maxPayouts = getMaxPayouts(netGpMtd);
@@ -355,40 +364,35 @@
                 const targetInput = document.getElementById(`${category.id}Target`);
                 const actualInput = document.getElementById(`${category.id}Actual`);
                 
-                // Get values
-                const target = parseFloat(targetInput.value);
-                const actual = parseFloat(actualInput.value); 
+                // Get values, default to 0 if field is blank
+                const target = parseFloat(targetInput.value || 0);
+                const actual = parseFloat(actualInput.value || 0); 
 
                 const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); 
                 const goalElement = document.getElementById(`${category.id}Goal`);
-                const progressElement = document.getElementById(`${category.id}Progress`); // Get progress bar
                 
                 // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
                 const categoryMax = maxPayouts[category.id];
 
                 // 1. Input Validation: Target must be > 0 and Actual must be >= 0
-                if (isNaN(target) || target <= 0 || isNaN(actual) || actual < 0 || categoryMax === 0) {
+                // We default empty strings to 0 for parsing, so we check if the *value* of the target is 0 or less
+                if (target <= 0 || actual < 0 || categoryMax === 0 || netGpMtd <= 0) {
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
-                    // Reset all dynamic color classes
-                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-orange-500'); 
-                    payoutElement.classList.add('text-red-700'); 
+                    // Set color to a neutral gray for invalid state
+                    payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500'); 
+                    payoutElement.classList.add('text-gray-500'); 
                     
                     let statusText = 'Awaiting valid input...';
-                    if (categoryMax === 0 && !isNaN(netGpMtd) && netGpMtd > 0) {
+                    if (categoryMax === 0 && netGpMtd > 0) {
                         statusText = 'GP MTD tier not met.';
+                    } else if (netGpMtd <= 0) {
+                         statusText = 'Enter GP MTD.';
+                    } else if (target <= 0) {
+                        statusText = 'Enter Target.';
                     }
-                    // Apply dark mode goal status color
-                    goalElement.classList.remove('text-gray-500', 'dark:text-gray-400');
-                    goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
-                    goalElement.textContent = `Goal: ${statusText}`;
                     
-                    // Reset progress bar
-                    if (progressElement) {
-                        progressElement.style.width = '0%';
-                        progressElement.classList.remove('bg-green-600', 'bg-orange-500', 'bg-red-600');
-                        progressElement.classList.add('bg-red-600');
-                    }
+                    goalElement.textContent = `Goal: ${statusText}`;
                     continue; // Skip calculation for this invalid category
                 }
                 
@@ -431,48 +435,29 @@
                 
                 goalElement.textContent = `Goal: ${goalText}`;
 
-                // --- Update Progress Bar ---
-                // Cap progress bar display at 100% (even if payout is 125%)
-                const progressPercent = Math.min(percentageToGoal * 100, 100);
-                // Ensure progress is 0 if below minimum
-                const displayPercent = percentageToGoal < MIN_CAP ? 0 : progressPercent;
-                progressElement.style.width = `${displayPercent}%`;
-
-                // Color coding for individual payout AND progress bar
-                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-orange-500');
-                progressElement.classList.remove('bg-red-600', 'bg-green-600', 'bg-orange-500');
+                // Color coding for individual payout
+                payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500', 'text-gray-500'); // Clean all color classes
                 
                 if (percentageToGoal < MIN_CAP) {
                     // Payout is $0.00 (below 80% threshold)
-                    payoutElement.classList.add('text-red-700'); 
-                    progressElement.classList.add('bg-red-600');
+                    payoutElement.classList.add('text-red-500'); 
                 } else if (percentageToGoal < ORANGE_CAP) { 
                     // Between 80% and 90% (exclusive of 90%)
                     payoutElement.classList.add('text-orange-500');
-                    progressElement.classList.add('bg-orange-500');
                 } else {
                     // Payout is greater than or equal to 90%
-                    payoutElement.classList.add('text-green-600');
-                    progressElement.classList.add('bg-green-600');
+                    payoutElement.classList.add('text-green-500');
                 }
             }
 
             // --- 5. Final Calculations and Display ---
 
-            // Check Accelerator Validation against the new bounds (-45 and 45)
+            // Check Accelerator Validation
             if (acceleratorValue < ACCELERATOR_MIN || acceleratorValue > ACCELERATOR_MAX) {
                  // If accelerator is out of bounds, display error and zero out payouts
                 acceleratorError.classList.remove('hidden'); 
                 document.getElementById('totalBaseCommission').textContent = formatCurrency(0);
                 document.getElementById('finalPayout').textContent = formatCurrency(0);
-                // Ensure final payout card styling is error red
-                const finalPayoutCard = document.getElementById('finalPayoutCard');
-                finalPayoutCard.classList.remove('border-green-500', 'border-cyan-500');
-                finalPayoutCard.classList.add('border-red-500'); 
-
-                const finalPayoutText = document.getElementById('finalPayout');
-                finalPayoutText.classList.remove('text-green-500', 'text-cyan-400');
-                finalPayoutText.classList.add('text-red-500');
                 return;
             } else {
                 // If valid, ensure error is hidden
