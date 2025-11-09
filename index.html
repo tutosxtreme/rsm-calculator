@@ -193,10 +193,6 @@
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Voice</span>
                             <span id="payoutVoice" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
                             <span id="voiceGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="voiceProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
                         <!-- BTS Payout Display -->
@@ -204,10 +200,6 @@
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">BTS</span>
                             <span id="payoutBTS" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
                             <span id="btsGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="btsProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
                         <!-- Rotating Metric Payout Display -->
@@ -215,10 +207,6 @@
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Rotating Metric</span>
                             <span id="payoutRotatingMetric" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
                             <span id="rotatingmetricGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="rotatingmetricProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
                         <!-- VAF Payout Display -->
@@ -226,10 +214,6 @@
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">VAF</span>
                             <span id="payoutVAF" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
                             <span id="vafGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="vafProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                         
                         <!-- Accessories Payout Display -->
@@ -237,10 +221,6 @@
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Accessories</span>
                             <span id="payoutAccessories" class="text-xl font-extrabold text-green-600 block mt-1">$0.00</span>
                             <span id="accessoriesGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar -->
-                            <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 mt-2">
-                                <div id="accessoriesProgress" class="bg-green-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-                            </div>
                         </div>
                     </div>
 
@@ -251,7 +231,7 @@
                     </div>
 
                     <!-- Final Payout (with Accelerator) - Darkest layer (gray-950) with GLOW -->
-                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-gray-800 dark:bg-gray-950 rounded-2xl shadow-2xl dark-glow border-b-4 border-cyan-500 transition-all duration-300 transform hover:scale-[1.01]">
+                    <div class="flex justify-between items-center p-8 bg-gray-800 dark:bg-gray-950 rounded-2xl shadow-2xl dark-glow border-b-4 border-cyan-500 transition-all duration-300 transform hover:scale-[1.01]">
                         <!-- FINAL PAYOUT label stacked vertically for landscape optimization -->
                         <div class="flex flex-col text-white font-black tracking-wider text-left">
                             <span class="text-xl md:text-2xl leading-none">FINAL</span>
@@ -361,7 +341,6 @@
 
                 const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); 
                 const goalElement = document.getElementById(`${category.id}Goal`);
-                const progressElement = document.getElementById(`${category.id}Progress`); // Get progress bar
                 
                 // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
                 const categoryMax = maxPayouts[category.id];
@@ -371,7 +350,7 @@
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
                     // Reset all dynamic color classes
-                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-orange-500'); 
+                    payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); 
                     payoutElement.classList.add('text-red-700'); 
                     
                     let statusText = 'Awaiting valid input...';
@@ -382,13 +361,6 @@
                     goalElement.classList.remove('text-gray-500', 'dark:text-gray-400');
                     goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
                     goalElement.textContent = `Goal: ${statusText}`;
-                    
-                    // Reset progress bar
-                    if (progressElement) {
-                        progressElement.style.width = '0%';
-                        progressElement.classList.remove('bg-green-600', 'bg-orange-500', 'bg-red-600');
-                        progressElement.classList.add('bg-red-600');
-                    }
                     continue; // Skip calculation for this invalid category
                 }
                 
@@ -431,29 +403,18 @@
                 
                 goalElement.textContent = `Goal: ${goalText}`;
 
-                // --- Update Progress Bar ---
-                // Cap progress bar display at 100% (even if payout is 125%)
-                const progressPercent = Math.min(percentageToGoal * 100, 100);
-                // Ensure progress is 0 if below minimum
-                const displayPercent = percentageToGoal < MIN_CAP ? 0 : progressPercent;
-                progressElement.style.width = `${displayPercent}%`;
-
-                // Color coding for individual payout AND progress bar
-                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-orange-500');
-                progressElement.classList.remove('bg-red-600', 'bg-green-600', 'bg-orange-500');
+                // Color coding for individual payout
+                payoutElement.classList.remove('text-red-700', 'text-green-600', 'text-blue-700', 'text-orange-500'); // Clean all color classes
                 
                 if (percentageToGoal < MIN_CAP) {
                     // Payout is $0.00 (below 80% threshold)
                     payoutElement.classList.add('text-red-700'); 
-                    progressElement.classList.add('bg-red-600');
                 } else if (percentageToGoal < ORANGE_CAP) { 
                     // Between 80% and 90% (exclusive of 90%)
                     payoutElement.classList.add('text-orange-500');
-                    progressElement.classList.add('bg-orange-500');
                 } else {
                     // Payout is greater than or equal to 90%
                     payoutElement.classList.add('text-green-600');
-                    progressElement.classList.add('bg-green-600');
                 }
             }
 
@@ -478,24 +439,21 @@
             const finalPayout = totalBaseCommission * (1 + acceleratorPercent);
 
             // Update Final Payout display
-            const finalPayoutText = document.getElementById('finalPayout');
-            const finalPayoutCard = document.getElementById('finalPayoutCard');
-            finalPayoutText.textContent = formatCurrency(finalPayout);
+            document.getElementById('finalPayout').textContent = formatCurrency(finalPayout);
             
-            // Color coding for final payout text AND card border
-            finalPayoutText.classList.remove('text-red-500', 'text-green-500', 'text-cyan-400');
-            finalPayoutCard.classList.remove('border-red-500', 'border-green-500', 'border-cyan-500');
-
+            // Color coding for final payout based on accelerator (kept this logic)
+            document.getElementById('finalPayout').classList.remove('text-red-500', 'text-green-500', 'text-cyan-400');
             if (acceleratorPercent < 0) {
-                 finalPayoutText.classList.add('text-red-500');
-                 finalPayoutCard.classList.add('border-red-500');
+                 document.getElementById('finalPayout').classList.add('text-red-500');
             } else if (acceleratorPercent > 0) {
-                 finalPayoutText.classList.add('text-green-500');
-                 finalPayoutCard.classList.add('border-green-500');
+                 document.getElementById('finalPayout').classList.add('text-green-500');
             } else {
-                 finalPayoutText.classList.add('text-cyan-400'); // Neutral color for 0% acceleration
-                 finalPayoutCard.classList.add('border-cyan-500'); // Neutral border
+                 document.getElementById('finalPayout').classList.add('text-cyan-400'); // Neutral color for 0% acceleration
             }
         }
 
         // Initial setup on page load
+        document.addEventListener('DOMContentLoaded', calculateCommission);
+    </script>
+</body>
+</html>
