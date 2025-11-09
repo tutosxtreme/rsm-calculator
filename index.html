@@ -23,12 +23,13 @@
         }
         /* Custom shadow for a modern dark-mode glow on key elements */
         .dark-glow {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* Softer light mode shadow */
             transition: box-shadow 0.3s ease-in-out;
         }
         @media (prefers-color-scheme: dark) {
              .dark-glow {
-                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.8), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+                /* Cyan/Blue glow effect */
+                box-shadow: 0 0 35px -10px rgba(6, 182, 212, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.2);
             }
         }
 
@@ -79,6 +80,136 @@
                 text-fill-color: transparent;
             }
         }
+
+        /* --- NEW: Modern UI Additions --- */
+
+        /* 1. Section header style with gradient underline */
+        .section-header {
+            position: relative;
+            padding-bottom: 0.75rem; /* 12px */
+            display: flex;
+            align-items: center;
+        }
+        .section-header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 3rem; /* 48px */
+            height: 3px;
+            background: linear-gradient(90deg, #0ea5e9 0%, #4f46e5 100%); /* Same as light header */
+            border-radius: 99px;
+            transition: all 0.3s ease;
+        }
+        @media (prefers-color-scheme: dark) {
+            .section-header::after {
+                background: linear-gradient(90deg, #06b6d4 0%, #818cf8 100%); /* Same as dark header */
+            }
+        }
+
+        /* 2. SVG Icon styling */
+        .icon {
+            display: inline-block;
+            width: 1.25em; /* 20px */
+            height: 1.25em; /* 20px */
+            stroke-width: 1.5;
+            stroke: currentColor;
+            fill: none;
+            vertical-align: -0.25em;
+            margin-right: 0.5rem; /* 8px */
+            opacity: 0.7;
+        }
+
+        /* 3. Animation for pulsing border on Final Payout */
+        @keyframes pulse-border {
+            0%, 100% {
+                border-color: #06b6d4; /* Cyan-500 */
+                box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+            }
+            50% {
+                border-color: #818cf8; /* Indigo-300 */
+                box-shadow: 0 0 30px rgba(129, 140, 248, 0.6);
+            }
+        }
+        .animated-final-payout {
+            animation: pulse-border 3s ease-in-out infinite;
+        }
+
+        /* 4. Animation for content fade-in */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .fade-in {
+            animation: fadeInUp 0.5s ease-out forwards;
+            opacity: 0; /* Start hidden */
+        }
+        
+        /* Staggered delays */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+        .delay-600 { animation-delay: 0.6s; }
+        .delay-700 { animation-delay: 0.7s; }
+
+        /* 5. Progress Bar Gradients (Color-Coded) */
+        .progress-red {
+            /* Light Mode: Red-300 to Red-700 (Very noticeable range) */
+            background: linear-gradient(90deg, #fca5a5, #b91c1c); 
+            transition: all 0.5s ease-in-out;
+        }
+        @media (prefers-color-scheme: dark) {
+            .progress-red {
+                /* Dark Mode: Red-500 to Red-900 (Deep, rich gradient) */
+                background: linear-gradient(90deg, #ef4444, #450a0a); 
+            }
+        }
+        .progress-orange {
+            /* Light Mode: Amber-200 to Orange-700 */
+            background: linear-gradient(90deg, #fde68a, #c2410c); 
+            transition: all 0.5s ease-in-out;
+        }
+        @media (prefers-color-scheme: dark) {
+            .progress-orange {
+                /* Dark Mode: Orange-400 to Yellow-900 */
+                background: linear-gradient(90deg, #fb923c, #422006); 
+            }
+        }
+        /* Default for 90% and above */
+        .progress-green {
+            /* Light Mode: Lime-300 to Emerald-700 */
+            background: linear-gradient(90deg, #a3e635, #047857); 
+            transition: all 0.5s ease-in-out;
+        }
+        @media (prefers-color-scheme: dark) {
+            .progress-green {
+                /* Dark Mode: Green-400 to Green-900 */
+                background: linear-gradient(90deg, #4ade80, #064e3b); 
+            }
+        }
+
+        /* --- Input Card Hover Styling for linking (Change 2) --- */
+        /* Use a custom utility class on the output cards managed by JS */
+        .output-highlight-active {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); /* Cyan glow */
+            border-color: #06b6d4 !important; /* Cyan border */
+            transform: scale(1.02); /* Slight scale up */
+            z-index: 10; /* Bring forward */
+        }
+        /* Ensure the input card has a subtle pointer style */
+        .input-category-card {
+            cursor: pointer;
+        }
+        /* --- End NEW --- */
+
     </style>
 </head>
 <body class="min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center overflow-x-hidden transition-colors duration-300">
@@ -96,10 +227,13 @@
             
             <!-- COLUMN 1: Inputs -->
             <div>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Inputs</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 12H7.5" /></svg>
+                    Inputs
+                </h2>
 
-                <!-- Store's Net Gross Profit Input Card -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-6 transition-all duration-300">
+                <!-- Store's Net Gross Profit Input Card (Change 1: Added ID) -->
+                <div id="netGpMtdCard" class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-6 transition-all duration-300 fade-in border border-gray-100 dark:border-gray-700">
                     <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-3">Store’s Net Gross Profit (MTD) ($)</label>
                     <input type="number" id="netGpMtdInput" min="0" oninput="calculateCommission()"
                            class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
@@ -110,7 +244,7 @@
                 </div>
 
                 <!-- Accelerator Input Card -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-8 transition-all duration-300">
+                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-8 transition-all duration-300 fade-in delay-100">
                     <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 dark:text-red-300 mb-3">Accelerator / Decelerator (%)</label>
                     <input type="number" id="acceleratorInput" min="-45" max="45" step="1" oninput="calculateCommission()"
                            class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
@@ -122,92 +256,110 @@
                 </div>
                 
                 <!-- Targets & Actuals Sub-Header -->
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Targets & Actuals</h2>
+                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25c.375 0 .75.062 1.125.188m-1.125.188a2.25 2.25 0 0 1-2.25 2.25m2.25-2.25a2.25 2.25 0 0 0 2.25 2.25M10.125 2.25a2.25 2.25 0 0 1 2.25 2.25m0 0a2.25 2.25 0 0 1 2.25 2.25m2.25 2.25v-9l-4.5-4.5m0 0a2.25 2.25 0 0 1-2.25 2.25m0 0a2.25 2.25 0 0 0-2.25 2.25m2.25 2.25a2.25 2.25 0 0 1 2.25 2.25M12 18.75a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75M12 15a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75M12 11.25a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75" /></svg>
+                    Targets & Actuals
+                </h2>
                 
-                <!-- Category Breakdown Inputs -->
-                <div id="categoryInputs" class="space-y-6 mb-8 md:mb-0">
+                <!-- Category Breakdown Inputs (Reduced spacing: space-y-6 -> space-y-4) -->
+                <div id="categoryInputs" class="space-y-4 mb-8 md:mb-0 fade-in delay-200">
                     
-                    <!-- Voice Card (Qty) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Voice (Qty)</h3>
+                    <!-- Voice Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <div data-target="voiceResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Reduced title font: text-lg -> text-base -->
+                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Voice (Qty)</h3>
                         <div class="flex space-x-6"> 
                             <div class="w-1/2">
                                 <label for="voiceTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="voiceTarget" data-category="voice" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="voiceActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="voiceActual" data-category="voice" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- BTS Card (Qty) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">BTS (Qty)</h3>
+                    <!-- BTS Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <div data-target="btsResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Reduced title font: text-lg -> text-base -->
+                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">BTS (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="btsTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="btsTarget" data-category="bts" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="btsActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="btsActual" data-category="bts" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Rotating Metric Card (Qty) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric (Qty)</h3>
+                    <!-- Rotating Metric Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <div data-target="rotatingmetricResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Reduced title font: text-lg -> text-base -->
+                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- VAF Card ($) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-300 mb-4">VAF (Dollar Based)</h3>
+                    <!-- VAF Card ($) (Reduced padding: p-6 -> p-4) -->
+                    <div data-target="vafResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Reduced title font: text-lg -> text-base -->
+                        <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">VAF (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="vafTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="vafTarget" data-category="vaf" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="vafActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="vafActual" data-category="vaf" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Accessories Card ($) -->
-                    <div class="p-6 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-lg font-bold text-cyan-700 dark:text-cyan-300 mb-4">Accessories (Dollar Based)</h3>
+                    <!-- Accessories Card ($) (Reduced padding: p-6 -> p-4) -->
+                    <div data-target="accessoriesResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Reduced title font: text-lg -> text-base -->
+                        <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">Accessories (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="accessoriesTarget" data-category="accessories" min="1" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
+                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="accessoriesActual" data-category="accessories" min="0" oninput="calculateCommission()"
-                                       class="w-full p-3 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
@@ -219,51 +371,74 @@
                 <!-- Output Section -->
                 <div id="results" class="space-y-6 md:pt-[5.5rem]">
                     <!-- Payout Summary Header -->
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3">Payout Summary</h2>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
+                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2c-2.4 0-4.5 1.8-4.5 4.5v1.5h9V10.5C16.5 7.8 14.4 6 12 6zM12 18.75a.75.75 0 0 0 .75-.75V15h-1.5v3a.75.75 0 0 0 .75.75zM2.25 10.5h19.5M3.75 4.5v15h16.5V4.5M6 15h12M12 10.5v3"/></svg>
+                        Payout Summary
+                    </h2>
 
                     <!-- COMPACT GRID LAYOUT -->
-                    <div id="payoutDetails" class="grid grid-cols-2 gap-4"> 
+                    <div id="payoutDetails" class="grid grid-cols-2 gap-4 fade-in delay-100"> 
                         
-                        <!-- Payout Display Cards -->
-                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                        <!-- Payout Display Cards (Added transition classes for hover effect) -->
+                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Voice</span>
                             <span id="payoutVoice" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="voiceGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
+                            <!-- Progress Bar Container -->
+                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                <div id="voiceProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            </div>
                         </div>
                         
-                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">BTS</span>
                             <span id="payoutBTS" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="btsGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
+                            <!-- Progress Bar Container -->
+                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                <div id="btsProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            </div>
                         </div>
                         
-                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Rotating Metric</span>
                             <span id="payoutRotatingMetric" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="rotatingmetricGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
+                            <!-- Progress Bar Container -->
+                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                <div id="rotatingmetricProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            </div>
                         </div>
                         
-                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">VAF</span>
                             <span id="payoutVAF" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="vafGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
+                            <!-- Progress Bar Container -->
+                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                <div id="vafProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            </div>
                         </div>
                         
-                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-colors duration-300">
+                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Accessories</span>
                             <span id="payoutAccessories" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
                             <span id="accessoriesGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
+                            <!-- Progress Bar Container -->
+                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
+                                <div id="accessoriesProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Total Base Commission -->
-                    <div class="flex justify-between items-center p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md mt-8 transition-colors duration-300">
+                    <div class="flex justify-between items-center p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md mt-8 transition-colors duration-300 fade-in delay-200">
                         <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Total Base Commission</p>
                         <p id="totalBaseCommission" class="text-2xl font-extrabold text-gray-800 dark:text-gray-100">$0.00</p>
                     </div>
 
                     <!-- Final Payout (with Accelerator) - Highlighting Card -->
-                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-white dark:bg-gray-900 border-4 border-cyan-500 rounded-2xl shadow-2xl transition-all duration-300">
+                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-white dark:bg-gray-900 border-4 border-cyan-500 rounded-2xl shadow-2xl transition-all duration-300 fade-in delay-300 animated-final-payout">
                         <p class="text-xl md:text-2xl font-black text-gray-700 dark:text-gray-50 tracking-wider">FINAL PAYOUT</p>
                         <p id="finalPayout" class="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400">$0.00</p>
                     </div>
@@ -290,8 +465,8 @@
 
         // Tier definitions for Max Payouts based on Net GP MTD
         const GP_TIERS = [
-            // Tier 0: Less than $11,000 (0 - 10,999)
-            { min: 0, max: 10999, label: 'Tier 0 (Below $11,000)', rates: { voice: 150, bts: 75, vaf: 75, accessories: 50, rotatingmetric: 50 } },
+            // Tier 0: Less than $11,000 (0 - 10,999) - No Payout
+            { min: 0, max: 10999, label: 'Tier 0 (Below $11,000)', rates: { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 } },
             // Tier 1: 11k - 20,999
             { min: 11000, max: 20999, label: 'Tier 1 ($11,000 - $20,999)', rates: { voice: 375, bts: 175, vaf: 100, accessories: 75, rotatingmetric: 75 } },
             // Tier 2: 21k - 30,999
@@ -317,10 +492,15 @@
             }).format(amount);
         };
 
-        // Function to determine the max payout based on Net GP MTD
+        // Function to determine the max payout based on Net GP MTD (Change 1: Added card highlighting)
         function getMaxPayouts(netGpMtd) {
             const defaultRates = { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 };
             const statusElement = document.getElementById('tierStatus');
+            const cardElement = document.getElementById('netGpMtdCard'); // Get card element
+
+            // Reset state (removing highlight classes)
+            cardElement.classList.remove('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50');
+            cardElement.classList.add('border-gray-100', 'dark:border-gray-700', 'shadow-lg', 'dark-glow');
 
             if (isNaN(netGpMtd) || netGpMtd < 0) { // Check for valid non-negative input
                 statusElement.textContent = 'Awaiting valid GP MTD to determine max payouts.';
@@ -330,13 +510,18 @@
             // Iterate through the tiers to find the match
             for (const tier of GP_TIERS) {
                 if (netGpMtd >= tier.min && netGpMtd <= tier.max) {
-                    // Uses dark:text-cyan-300 for consistency
+                    // If a profitable tier is met (Tier 1 and above)
+                    if (tier.min >= 11000) {
+                        // NEW: Apply highlight
+                        cardElement.classList.add('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50'); // Stronger visual
+                        cardElement.classList.remove('border-gray-100', 'dark:border-gray-700');
+                    }
+                    
                     statusElement.innerHTML = `<span class="text-cyan-700 dark:text-cyan-300 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
                     return tier.rates;
                 }
             }
 
-            // Should theoretically not be reached if tiers are comprehensive, but acts as a safety
             statusElement.innerHTML = 'Error: GP MTD value outside defined tiers.';
             return defaultRates;
         }
@@ -370,17 +555,18 @@
 
                 const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); 
                 const goalElement = document.getElementById(`${category.id}Goal`);
+                const progressBarElement = document.getElementById(`${category.id}ProgressBar`);
                 
                 // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
                 const categoryMax = maxPayouts[category.id];
+                
+                // Reset text color classes on the payout and goal elements
+                payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500', 'text-gray-500'); 
 
                 // 1. Input Validation: Target must be > 0 and Actual must be >= 0
-                // We default empty strings to 0 for parsing, so we check if the *value* of the target is 0 or less
                 if (target <= 0 || actual < 0 || categoryMax === 0 || netGpMtd <= 0) {
                     // If invalid input OR Max Payout is 0, set payout to 0 
                     payoutElement.textContent = formatCurrency(0);
-                    // Set color to a neutral gray for invalid state
-                    payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500'); 
                     payoutElement.classList.add('text-gray-500'); 
                     
                     let statusText = 'Awaiting valid input...';
@@ -393,12 +579,41 @@
                     }
                     
                     goalElement.textContent = `Goal: ${statusText}`;
+                    goalElement.classList.remove('text-red-600', 'dark:text-red-400', 'text-green-600', 'dark:text-green-400', 'text-orange-600', 'dark:text-orange-400');
+                    goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
+
+
+                    // Reset progress bar on invalid input (setting it to default color)
+                    if (progressBarElement) { 
+                        const colorClasses = ['progress-red', 'progress-orange', 'progress-green'];
+                        progressBarElement.classList.remove(...colorClasses);
+                        progressBarElement.style.width = '0%';
+                    }
+                    
                     continue; // Skip calculation for this invalid category
                 }
                 
                 // 2. Calculate Percentage to Goal (P2G)
                 const percentageToGoal = actual / target;
 
+                // --- NEW: Dynamic Progress Bar Color based on P2G ---
+                const colorClasses = ['progress-red', 'progress-orange', 'progress-green'];
+                progressBarElement.classList.remove(...colorClasses); // Remove all previous colors
+
+                if (percentageToGoal < MIN_CAP) { // Below 80%
+                    progressBarElement.classList.add('progress-red');
+                } else if (percentageToGoal >= MIN_CAP && percentageToGoal < ORANGE_CAP) { // 80% to 90%
+                    progressBarElement.classList.add('progress-orange');
+                } else { // 90% and above
+                    progressBarElement.classList.add('progress-green');
+                }
+                
+                // Calculate Visual Bar Width
+                const visualWidth = Math.min(percentageToGoal * 100, 100); 
+                if (progressBarElement) {
+                    progressBarElement.style.width = `${visualWidth}%`;
+                }
+                
                 // 3. Apply Minimum (0% below 80%) and Maximum (125%) Cap
                 let cappedPercentage = percentageToGoal;
                 let capStatus;
@@ -420,34 +635,33 @@
                 // --- Update Category Output ---
                 payoutElement.textContent = formatCurrency(categoryPayout);
                 
-                // P2G Display Text
+                // P2G Display Text (Change 3: Enhanced P2G Clarity with color/style)
                 const p2gDisplay = `${(percentageToGoal * 100).toFixed(2)}%`;
                 
                 // Goal Status Text
-                let goalText = p2gDisplay;
-                if (capStatus === 'Below Minimum (0%)') {
-                    goalText += ` (No Payout below 80%)`;
-                } else if (capStatus === 'Max Cap (125%)') {
-                    goalText += ` (Capped at 125%)`;
-                } else {
-                    goalText += ` (${capStatus})`;
-                }
-                
-                goalElement.textContent = `Goal: ${goalText}`;
+                let goalHtml;
+                goalElement.classList.remove('text-red-600', 'dark:text-red-400', 'text-green-600', 'dark:text-green-400', 'text-orange-600', 'dark:text-orange-400', 'text-gray-500'); // Clean classes
 
-                // Color coding for individual payout
-                payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500', 'text-gray-500'); // Clean all color classes
-                
-                if (percentageToGoal < MIN_CAP) {
-                    // Payout is $0.00 (below 80% threshold)
+                if (capStatus === 'Below Minimum (0%)') {
+                    goalHtml = `<span class="font-bold text-red-600 dark:text-red-400">${p2gDisplay}</span> <span class="text-red-500 dark:text-red-400">(No Payout Below 80%)</span>`;
+                    goalElement.classList.add('text-red-600', 'dark:text-red-400');
                     payoutElement.classList.add('text-red-500'); 
-                } else if (percentageToGoal < ORANGE_CAP) { 
-                    // Between 80% and 90% (exclusive of 90%)
-                    payoutElement.classList.add('text-orange-500');
-                } else {
-                    // Payout is greater than or equal to 90%
+                } else if (capStatus === 'Max Cap (125%)') {
+                    goalHtml = `<span class="font-bold text-green-600 dark:text-green-400">${p2gDisplay}</span> <span class="text-xs italic text-green-500 dark:text-green-400">(Capped at 125%)</span>`;
+                    goalElement.classList.add('text-green-600', 'dark:text-green-400');
                     payoutElement.classList.add('text-green-500');
+                } else {
+                    goalHtml = `<span class="font-bold">${p2gDisplay}</span> (Actual)`;
+                    goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
+                    // Color coding for individual payout text (matches bar logic)
+                    if (percentageToGoal < ORANGE_CAP) { 
+                        payoutElement.classList.add('text-orange-500');
+                    } else {
+                        payoutElement.classList.add('text-green-500');
+                    }
                 }
+                
+                goalElement.innerHTML = `Goal: ${goalHtml}`;
             }
 
             // --- 5. Final Calculations and Display ---
@@ -470,7 +684,7 @@
             // Apply Accelerator/Decelerator
             const finalPayout = totalBaseCommission * (1 + acceleratorPercent);
 
-            // Update Final Payout display
+            // Update Final Payout display (Change 4: No functional change, relies on existing CSS)
             const finalPayoutText = document.getElementById('finalPayout');
             const finalPayoutCard = document.getElementById('finalPayoutCard');
             finalPayoutText.textContent = formatCurrency(finalPayout);
@@ -491,8 +705,33 @@
             }
         }
 
+        // --- NEW FUNCTION: Setup Input/Output Hover Effects (Change 2) ---
+        function setupHoverEffects() {
+            const inputCards = document.querySelectorAll('.input-category-card');
+
+            inputCards.forEach(inputCard => {
+                const targetId = inputCard.getAttribute('data-target');
+                const targetCard = document.getElementById(targetId);
+
+                if (targetCard) {
+                    // Mouse Enter: Highlight the target output card
+                    inputCard.addEventListener('mouseenter', () => {
+                        targetCard.classList.add('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10');
+                    });
+
+                    // Mouse Leave: Remove the highlight
+                    inputCard.addEventListener('mouseleave', () => {
+                        targetCard.classList.remove('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10');
+                    });
+                }
+            });
+        }
+
         // Initial setup on page load
-        document.addEventListener('DOMContentLoaded', calculateCommission);
+        document.addEventListener('DOMContentLoaded', () => {
+            calculateCommission();
+            setupHoverEffects(); // Call the new setup function
+        });
     </script>
 </body>
 </html>
