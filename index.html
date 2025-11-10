@@ -52,7 +52,7 @@
             transition: all 0.2s ease-in-out; /* Add transition for hover effect */
         }
 
-        /* NEW: Input hover bounce effect */
+        /* Input hover bounce effect */
         input[type="number"]:hover:not(:focus) { /* Don't apply when focused to avoid conflict */
             transform: translateY(-2px);
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
@@ -63,7 +63,7 @@
             }
         }
 
-        /* NEW: Gradient text class for header */
+        /* Gradient text class for header */
         .gradient-text {
             background: linear-gradient(90deg, #0ea5e9 0%, #4f46e5 100%); /* Sky-500 to Indigo-600 */
             -webkit-background-clip: text;
@@ -81,7 +81,7 @@
             }
         }
 
-        /* --- NEW: Modern UI Additions --- */
+        /* --- Modern UI Additions --- */
 
         /* 1. Section header style with gradient underline */
         .section-header {
@@ -196,20 +196,75 @@
             }
         }
 
-        /* --- Input Card Hover Styling for linking (Change 2) --- */
-        /* Use a custom utility class on the output cards managed by JS */
-        .output-highlight-active {
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); /* Cyan glow */
-            border-color: #06b6d4 !important; /* Cyan border */
-            transform: scale(1.02); /* Slight scale up */
-            z-index: 10; /* Bring forward */
+        /* 6. Tier Status Chip Styling */
+        .tier-chip {
+            display: inline-block;
+            padding: 0.25rem 0.75rem; /* py-1 px-3 */
+            border-radius: 9999px; /* full rounded */
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 700; /* font-bold */
+            margin-top: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        /* 7. Input Card Focus Highlight */
+        .card-focus-highlight {
+            background-color: #ecfeff; /* Light Cyan 50 */
+            border-color: #06b6d4 !important;
+            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
+        }
+        @media (prefers-color-scheme: dark) {
+            .card-focus-highlight {
+                background-color: #083344; /* Dark Cyan 900/50 */
+                border-color: #22d3ee !important;
+                box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.2);
+            }
+        }
+        
+        /* 8. Total Base Commission Gradient */
+        .base-commission-gradient {
+            /* Light Mode */
+            background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%); /* Sky 50 to Sky 100 */
+        }
+        @media (prefers-color-scheme: dark) {
+            .base-commission-gradient {
+                /* Dark Mode */
+                background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%); /* Slate 800 to Slate 900 */
+            }
         }
         /* Ensure the input card has a subtle pointer style */
         .input-category-card {
             cursor: pointer;
         }
-        /* --- End NEW --- */
 
+        /* --- FIX: Progress Bar Text Legibility (New Style) --- */
+        .progress-text-overlay {
+            /* Default to dark gray text in light mode */
+            color: #334155; 
+            /* Subtle white stroke for contrast against colored fill */
+            text-shadow: 
+                1px 1px 0 #fff,
+                -1px -1px 0 #fff,
+                1px -1px 0 #fff,
+                -1px 1px 0 #fff,
+                2px 2px 4px rgba(0,0,0,0.3); /* Subtle drop shadow for depth */
+            transition: all 0.3s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .progress-text-overlay {
+                 /* Default to light gray text in dark mode */
+                color: #e5e7eb; 
+                /* Subtle dark stroke for contrast against light background/colored fill */
+                text-shadow: 
+                    1px 1px 0 #000,
+                    -1px -1px 0 #000,
+                    1px -1px 0 #000,
+                    -1px 1px 0 #000,
+                    2px 2px 4px rgba(255,255,255,0.2); /* Subtle light drop shadow */
+            }
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center overflow-x-hidden transition-colors duration-300">
@@ -232,14 +287,15 @@
                     Inputs
                 </h2>
 
-                <!-- Store's Net Gross Profit Input Card (Change 1: Added ID) -->
+                <!-- Store's Net Gross Profit Input Card -->
                 <div id="netGpMtdCard" class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-6 transition-all duration-300 fade-in border border-gray-100 dark:border-gray-700">
                     <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-3">Store’s Net Gross Profit (MTD) ($)</label>
                     <input type="number" id="netGpMtdInput" min="0" oninput="calculateCommission()"
                            class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
                            placeholder="Enter Gross Profit">
-                    <div id="tierStatus" class="text-xs text-cyan-600 dark:text-cyan-400 mt-4 text-center font-medium">
-                        Awaiting valid GP MTD to determine max payouts.
+                    <!-- Updated to use the tier-chip styling -->
+                    <div id="tierStatus" class="text-xs text-cyan-600 dark:text-cyan-400 mt-4 text-center font-medium flex justify-center">
+                        <div class="tier-chip bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Awaiting Valid Input</div>
                     </div>
                 </div>
 
@@ -257,107 +313,92 @@
                 
                 <!-- Targets & Actuals Sub-Header -->
                 <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25c.375 0 .75.062 1.125.188m-1.125.188a2.25 2.25 0 0 1-2.25 2.25m2.25-2.25a2.25 2.25 0 0 0 2.25 2.25M10.125 2.25a2.25 2.25 0 0 1 2.25 2.25m0 0a2.25 2.25 0 0 1 2.25 2.25m2.25 2.25v-9l-4.5-4.5m0 0a2.25 2.25 0 0 1-2.25 2.25m0 0a2.25 2.25 0 0 0-2.25 2.25m2.25 2.25a2.25 2.25 0 0 1 2.25 2.25M12 18.75a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75M12 15a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75M12 11.25a.375.375 0 1 0 0 .75.375.375 0 0 0 0-.75Zm0 0H8.25m3.75 0h3.75" /></svg>
+                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
                     Targets & Actuals
                 </h2>
                 
-                <!-- Category Breakdown Inputs (Reduced spacing: space-y-6 -> space-y-4) -->
+                <!-- Category Breakdown Inputs -->
                 <div id="categoryInputs" class="space-y-4 mb-8 md:mb-0 fade-in delay-200">
                     
-                    <!-- Voice Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <!-- Voice Card (Qty) -->
                     <div data-target="voiceResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <!-- Reduced title font: text-lg -> text-base -->
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Voice (Qty)</h3>
                         <div class="flex space-x-6"> 
                             <div class="w-1/2">
                                 <label for="voiceTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="voiceTarget" data-category="voice" min="1" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="voiceActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="voiceActual" data-category="voice" min="0" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- BTS Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <!-- BTS Card (Qty) -->
                     <div data-target="btsResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <!-- Reduced title font: text-lg -> text-base -->
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">BTS (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="btsTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="btsTarget" data-category="bts" min="1" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="btsActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="btsActual" data-category="bts" min="0" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Rotating Metric Card (Qty) (Reduced padding: p-6 -> p-4) -->
+                    <!-- Rotating Metric Card (Qty) -->
                     <div data-target="rotatingmetricResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <!-- Reduced title font: text-lg -> text-base -->
                         <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric (Qty)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" min="1" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" min="0" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- VAF Card ($) (Reduced padding: p-6 -> p-4) -->
+                    <!-- VAF Card ($) -->
                     <div data-target="vafResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <!-- Reduced title font: text-lg -> text-base -->
                         <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">VAF (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="vafTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="vafTarget" data-category="vaf" min="1" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="vafActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="vafActual" data-category="vaf" min="0" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                         </div>
                     </div>
 
-                    <!-- Accessories Card ($) (Reduced padding: p-6 -> p-4) -->
+                    <!-- Accessories Card ($) -->
                     <div data-target="accessoriesResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <!-- Reduced title font: text-lg -> text-base -->
                         <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">Accessories (Dollar Based)</h3>
                         <div class="flex space-x-6">
                             <div class="w-1/2">
                                 <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="accessoriesTarget" data-category="accessories" min="1" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
                             <div class="w-1/2">
                                 <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
-                                <!-- Reduced input padding: p-3 -> p-2 -->
                                 <input type="number" id="accessoriesActual" data-category="accessories" min="0" oninput="calculateCommission()"
                                        class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
                             </div>
@@ -379,60 +420,82 @@
                     <!-- COMPACT GRID LAYOUT -->
                     <div id="payoutDetails" class="grid grid-cols-2 gap-4 fade-in delay-100"> 
                         
-                        <!-- Payout Display Cards (Added transition classes for hover effect) -->
-                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                        <!-- Payout Display Card (Voice) -->
+                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Voice</span>
+                            <!-- Payout text is now color-coded by JS -->
                             <span id="payoutVoice" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <span id="voiceGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar Container -->
-                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <div id="voiceProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            
+                            <!-- Progress Bar Container with Text Overlay -->
+                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
+                                <!-- Progress Bar Background (Inner div) -->
+                                <div id="voiceProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
+                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
+                                <div id="voiceP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
+                                    Awaiting input...
+                                </div>
                             </div>
                         </div>
                         
-                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                        <!-- Payout Display Card (BTS) -->
+                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">BTS</span>
                             <span id="payoutBTS" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <span id="btsGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar Container -->
-                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <div id="btsProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            <!-- Progress Bar Container with Text Overlay -->
+                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
+                                <div id="btsProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
+                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
+                                <div id="btsP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
+                                    Awaiting input...
+                                </div>
                             </div>
                         </div>
                         
-                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                        <!-- Payout Display Card (Rotating Metric) -->
+                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Rotating Metric</span>
                             <span id="payoutRotatingMetric" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <span id="rotatingmetricGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar Container -->
-                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <div id="rotatingmetricProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            <!-- Progress Bar Container with Text Overlay -->
+                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
+                                <div id="rotatingmetricProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
+                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
+                                <div id="rotatingmetricP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
+                                    Awaiting input...
+                                </div>
                             </div>
                         </div>
                         
-                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                        <!-- Payout Display Card (VAF) -->
+                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">VAF</span>
                             <span id="payoutVAF" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <span id="vafGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar Container -->
-                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <div id="vafProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            <!-- Progress Bar Container with Text Overlay -->
+                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
+                                <div id="vafProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
+                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
+                                <div id="vafP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
+                                    Awaiting input...
+                                </div>
                             </div>
                         </div>
                         
-                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300">
+                        <!-- Payout Display Card (Accessories) -->
+                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
                             <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Accessories</span>
                             <span id="payoutAccessories" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <span id="accessoriesGoal" class="text-xs text-gray-500 dark:text-gray-400 block mt-1 truncate">Awaiting valid input...</span>
-                            <!-- Progress Bar Container -->
-                            <div class="h-2 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700">
-                                <div id="accessoriesProgressBar" style="width: 0%;" class="h-full transition-all duration-500"></div>
+                            <!-- Progress Bar Container with Text Overlay -->
+                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
+                                <div id="accessoriesProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
+                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
+                                <div id="accessoriesP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
+                                    Awaiting input...
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Total Base Commission -->
-                    <div class="flex justify-between items-center p-6 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-md mt-8 transition-colors duration-300 fade-in delay-200">
+                    <div class="flex justify-between items-center p-6 base-commission-gradient rounded-xl shadow-xl border border-sky-200 dark:border-gray-700 mt-8 transition-colors duration-300 fade-in delay-200">
                         <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Total Base Commission</p>
                         <p id="totalBaseCommission" class="text-2xl font-extrabold text-gray-800 dark:text-gray-100">$0.00</p>
                     </div>
@@ -492,37 +555,50 @@
             }).format(amount);
         };
 
-        // Function to determine the max payout based on Net GP MTD (Change 1: Added card highlighting)
+        // Function to determine the max payout based on Net GP MTD
         function getMaxPayouts(netGpMtd) {
             const defaultRates = { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 };
             const statusElement = document.getElementById('tierStatus');
-            const cardElement = document.getElementById('netGpMtdCard'); // Get card element
+            const cardElement = document.getElementById('netGpMtdCard');
+            
+            // Clear previous tier chip classes
+            statusElement.className = 'text-center font-medium mt-4 flex justify-center'; // Ensure alignment is centered
 
-            // Reset state (removing highlight classes)
-            cardElement.classList.remove('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50');
-            cardElement.classList.add('border-gray-100', 'dark:border-gray-700', 'shadow-lg', 'dark-glow');
+            // Clear previous card highlight classes
+            cardElement.classList.remove('card-focus-highlight', 'border-4', 'border-indigo-500', 'border-green-500', 'dark:shadow-indigo-500/50', 'dark:shadow-green-500/50', 'shadow-xl');
+            cardElement.classList.add('border-gray-100', 'dark:border-gray-700', 'shadow-lg', 'dark-glow'); // Reset to default style
 
             if (isNaN(netGpMtd) || netGpMtd < 0) { // Check for valid non-negative input
-                statusElement.textContent = 'Awaiting valid GP MTD to determine max payouts.';
+                statusElement.innerHTML = `<div class="tier-chip bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Awaiting Valid Input</div>`;
                 return defaultRates;
             }
             
             // Iterate through the tiers to find the match
             for (const tier of GP_TIERS) {
                 if (netGpMtd >= tier.min && netGpMtd <= tier.max) {
-                    // If a profitable tier is met (Tier 1 and above)
-                    if (tier.min >= 11000) {
-                        // NEW: Apply highlight
-                        cardElement.classList.add('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50'); // Stronger visual
+                    
+                    let tierHtml;
+                    
+                    if (tier.min < 11000) { // Tier 0 (No Payout)
+                        tierHtml = `<div class="tier-chip bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">${tier.label} (No Payout)</div>`;
+                    } else if (tier.min === 81000) { // Tier 6 (Top Tier)
+                        tierHtml = `<div class="tier-chip bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">${tier.label} Achieved!</div>`;
+                        // Apply strong highlight for top tier
                         cardElement.classList.remove('border-gray-100', 'dark:border-gray-700');
+                        cardElement.classList.add('border-4', 'border-green-500', 'shadow-xl', 'dark:shadow-green-500/50');
+                    } else { // Tier 1-5 (Profitable Tiers)
+                        tierHtml = `<div class="tier-chip bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">${tier.label} Achieved</div>`;
+                        // Apply moderate highlight
+                        cardElement.classList.remove('border-gray-100', 'dark:border-gray-700');
+                        cardElement.classList.add('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50');
                     }
                     
-                    statusElement.innerHTML = `<span class="text-cyan-700 dark:text-cyan-300 font-bold">${tier.label}</span> achieved. Max Payout rates applied.`;
+                    statusElement.innerHTML = tierHtml;
                     return tier.rates;
                 }
             }
 
-            statusElement.innerHTML = 'Error: GP MTD value outside defined tiers.';
+            statusElement.innerHTML = `<div class="tier-chip bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">Error: Tier Not Found</div>`;
             return defaultRates;
         }
 
@@ -554,14 +630,16 @@
                 const actual = parseFloat(actualInput.value || 0); 
 
                 const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); 
-                const goalElement = document.getElementById(`${category.id}Goal`);
                 const progressBarElement = document.getElementById(`${category.id}ProgressBar`);
+                const p2gTextElement = document.getElementById(`${category.id}P2GText`); 
                 
                 // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
                 const categoryMax = maxPayouts[category.id];
                 
-                // Reset text color classes on the payout and goal elements
+                // Reset text color classes on the payout element
                 payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500', 'text-gray-500'); 
+                
+                // Note: We no longer remove dynamic P2G text classes, as the color is handled by the CSS stroke/shadow.
 
                 // 1. Input Validation: Target must be > 0 and Actual must be >= 0
                 if (target <= 0 || actual < 0 || categoryMax === 0 || netGpMtd <= 0) {
@@ -569,7 +647,7 @@
                     payoutElement.textContent = formatCurrency(0);
                     payoutElement.classList.add('text-gray-500'); 
                     
-                    let statusText = 'Awaiting valid input...';
+                    let statusText = 'Awaiting input...';
                     if (categoryMax === 0 && netGpMtd > 0) {
                         statusText = 'GP MTD tier not met.';
                     } else if (netGpMtd <= 0) {
@@ -578,10 +656,8 @@
                         statusText = 'Enter Target.';
                     }
                     
-                    goalElement.textContent = `Goal: ${statusText}`;
-                    goalElement.classList.remove('text-red-600', 'dark:text-red-400', 'text-green-600', 'dark:text-green-400', 'text-orange-600', 'dark:text-orange-400');
-                    goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
-
+                    // Update P2G text element
+                    p2gTextElement.textContent = statusText;
 
                     // Reset progress bar on invalid input (setting it to default color)
                     if (progressBarElement) { 
@@ -596,16 +672,32 @@
                 // 2. Calculate Percentage to Goal (P2G)
                 const percentageToGoal = actual / target;
 
-                // --- NEW: Dynamic Progress Bar Color based on P2G ---
+                // --- Dynamic Progress Bar Color based on P2G ---
                 const colorClasses = ['progress-red', 'progress-orange', 'progress-green'];
                 progressBarElement.classList.remove(...colorClasses); // Remove all previous colors
+                
+                // 3. Apply Minimum (0% below 80%) and Maximum (125%) Cap
+                let cappedPercentage = percentageToGoal;
+                let statusText = `${(percentageToGoal * 100).toFixed(2)}%`; // Default display is the percentage
 
                 if (percentageToGoal < MIN_CAP) { // Below 80%
+                    cappedPercentage = 0; // Payout is $0 if below 80%
                     progressBarElement.classList.add('progress-red');
+                    payoutElement.classList.add('text-red-500'); 
+                    statusText += ' (0% Payout)';
                 } else if (percentageToGoal >= MIN_CAP && percentageToGoal < ORANGE_CAP) { // 80% to 90%
                     progressBarElement.classList.add('progress-orange');
-                } else { // 90% and above
+                    payoutElement.classList.add('text-orange-500');
+                    statusText += ' (Actual)';
+                } else if (percentageToGoal > MAX_CAP) {
+                    cappedPercentage = MAX_CAP;
                     progressBarElement.classList.add('progress-green');
+                    payoutElement.classList.add('text-green-500');
+                    statusText += ' (Capped 125%)';
+                } else { // 90% to 125%
+                    progressBarElement.classList.add('progress-green');
+                    payoutElement.classList.add('text-green-500');
+                    statusText += ' (Actual)';
                 }
                 
                 // Calculate Visual Bar Width
@@ -614,54 +706,13 @@
                     progressBarElement.style.width = `${visualWidth}%`;
                 }
                 
-                // 3. Apply Minimum (0% below 80%) and Maximum (125%) Cap
-                let cappedPercentage = percentageToGoal;
-                let capStatus;
-                
-                if (percentageToGoal < MIN_CAP) {
-                    cappedPercentage = 0; // Payout is $0 if below 80%
-                    capStatus = 'Below Minimum (0%)';
-                } else if (percentageToGoal > MAX_CAP) {
-                    cappedPercentage = MAX_CAP;
-                    capStatus = 'Max Cap (125%)';
-                } else {
-                    capStatus = 'Actual';
-                }
-
                 // 4. Calculate Base Payout (using the dynamic categoryMax)
                 const categoryPayout = categoryMax * cappedPercentage;
                 totalBaseCommission += categoryPayout;
 
                 // --- Update Category Output ---
                 payoutElement.textContent = formatCurrency(categoryPayout);
-                
-                // P2G Display Text (Change 3: Enhanced P2G Clarity with color/style)
-                const p2gDisplay = `${(percentageToGoal * 100).toFixed(2)}%`;
-                
-                // Goal Status Text
-                let goalHtml;
-                goalElement.classList.remove('text-red-600', 'dark:text-red-400', 'text-green-600', 'dark:text-green-400', 'text-orange-600', 'dark:text-orange-400', 'text-gray-500'); // Clean classes
-
-                if (capStatus === 'Below Minimum (0%)') {
-                    goalHtml = `<span class="font-bold text-red-600 dark:text-red-400">${p2gDisplay}</span> <span class="text-red-500 dark:text-red-400">(No Payout Below 80%)</span>`;
-                    goalElement.classList.add('text-red-600', 'dark:text-red-400');
-                    payoutElement.classList.add('text-red-500'); 
-                } else if (capStatus === 'Max Cap (125%)') {
-                    goalHtml = `<span class="font-bold text-green-600 dark:text-green-400">${p2gDisplay}</span> <span class="text-xs italic text-green-500 dark:text-green-400">(Capped at 125%)</span>`;
-                    goalElement.classList.add('text-green-600', 'dark:text-green-400');
-                    payoutElement.classList.add('text-green-500');
-                } else {
-                    goalHtml = `<span class="font-bold">${p2gDisplay}</span> (Actual)`;
-                    goalElement.classList.add('text-gray-500', 'dark:text-gray-400');
-                    // Color coding for individual payout text (matches bar logic)
-                    if (percentageToGoal < ORANGE_CAP) { 
-                        payoutElement.classList.add('text-orange-500');
-                    } else {
-                        payoutElement.classList.add('text-green-500');
-                    }
-                }
-                
-                goalElement.innerHTML = `Goal: ${goalHtml}`;
+                p2gTextElement.textContent = statusText;
             }
 
             // --- 5. Final Calculations and Display ---
@@ -684,7 +735,7 @@
             // Apply Accelerator/Decelerator
             const finalPayout = totalBaseCommission * (1 + acceleratorPercent);
 
-            // Update Final Payout display (Change 4: No functional change, relies on existing CSS)
+            // Update Final Payout display
             const finalPayoutText = document.getElementById('finalPayout');
             const finalPayoutCard = document.getElementById('finalPayoutCard');
             finalPayoutText.textContent = formatCurrency(finalPayout);
@@ -705,8 +756,26 @@
             }
         }
 
-        // --- NEW FUNCTION: Setup Input/Output Hover Effects (Change 2) ---
-        function setupHoverEffects() {
+        // --- NEW FUNCTION: Setup Input/Output Interaction Effects ---
+        function setupInteractionEffects() {
+            // Gross Profit Input Focus Highlight
+            const gpInput = document.getElementById('netGpMtdInput');
+            const gpCard = document.getElementById('netGpMtdCard');
+
+            gpInput.addEventListener('focus', () => {
+                gpCard.classList.add('card-focus-highlight');
+                // Remove existing tier-based borders while focused
+                gpCard.classList.remove('border-4', 'border-indigo-500', 'border-green-500', 'dark:shadow-indigo-500/50', 'dark:shadow-green-500/50', 'shadow-xl');
+            });
+
+            gpInput.addEventListener('blur', () => {
+                gpCard.classList.remove('card-focus-highlight');
+                // Re-run calculation to re-apply the tier-based border color (handled in getMaxPayouts)
+                calculateCommission(); 
+            });
+
+
+            // Existing logic for linking category inputs to category outputs (Hover)
             const inputCards = document.querySelectorAll('.input-category-card');
 
             inputCards.forEach(inputCard => {
@@ -716,12 +785,16 @@
                 if (targetCard) {
                     // Mouse Enter: Highlight the target output card
                     inputCard.addEventListener('mouseenter', () => {
+                        // Added slight background change for visual linking
                         targetCard.classList.add('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10');
+                        targetCard.classList.remove('bg-gray-100', 'dark:bg-gray-800');
+                        targetCard.classList.add('bg-cyan-50', 'dark:bg-gray-700');
                     });
 
                     // Mouse Leave: Remove the highlight
                     inputCard.addEventListener('mouseleave', () => {
-                        targetCard.classList.remove('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10');
+                        targetCard.classList.remove('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10', 'bg-cyan-50', 'dark:bg-gray-700');
+                        targetCard.classList.add('bg-gray-100', 'dark:bg-gray-800');
                     });
                 }
             });
@@ -730,7 +803,7 @@
         // Initial setup on page load
         document.addEventListener('DOMContentLoaded', () => {
             calculateCommission();
-            setupHoverEffects(); // Call the new setup function
+            setupInteractionEffects(); // Call the new setup function
         });
     </script>
 </body>
