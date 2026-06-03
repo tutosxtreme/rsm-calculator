@@ -1,810 +1,1142 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Prevents unwanted mobile zoom -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RSM Bonus Calculator</title>
-    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font --><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Store Manager Bonus Calculator</title>
+    <!-- Tailwind CSS for modern responsive utility-first design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Inter Google Font for legible, professional typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons for high quality modern visual representations -->
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            /* Default Light Mode Styles */
-            background: linear-gradient(135deg, #f8fafc 0%, #f0f4f9 100%); /* Subtle gradient */
-            color: #334155; 
         }
-        /* Dark Mode Styles (Deeper, More Contrast) */
-        @media (prefers-color-scheme: dark) {
+        /* Custom print styling to make bonus summaries easily printable */
+        @media print {
+            .no-print {
+                display: none !important;
+            }
             body {
-                background: linear-gradient(135deg, #020617 0%, #0f172a 100%); /* Subtle dark gradient */
-                color: #e5e7eb; /* Tailwind gray-200 for general body text */
+                background: white !important;
+                color: black !important;
+            }
+            .print-card {
+                border: 1px solid #e2e8f0 !important;
+                box-shadow: none !important;
             }
         }
-        /* Custom shadow for a modern dark-mode glow on key elements */
-        .dark-glow {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -4px rgba(0, 0, 0, 0.05); /* Softer light mode shadow */
-            transition: box-shadow 0.3s ease-in-out;
+        /* Glassmorphism subtle effects */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
         }
-        @media (prefers-color-scheme: dark) {
-             .dark-glow {
-                /* Cyan/Blue glow effect */
-                box-shadow: 0 0 35px -10px rgba(6, 182, 212, 0.2), 0 10px 15px -3px rgba(0, 0, 0, 0.2);
-            }
-        }
-
-        /* Input focus style: a clear cyan ring for usability */
-        .input-focus-cyan:focus {
-            outline: none;
-            border-color: #06b6d4 !important; /* Cyan-500 */
-            box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.5); /* Cyan ring */
-            transition: box-shadow 0.2s, border-color 0.2s;
-        }
-
-        /* Hide number input spin buttons for a cleaner look */
-        input[type="number"]::-webkit-inner-spin-button,
-        input[type="number"]::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
-        input[type="number"] {
-            -moz-appearance: textfield; /* Firefox */
-            transition: all 0.2s ease-in-out; /* Add transition for hover effect */
-        }
-
-        /* Input hover bounce effect */
-        input[type="number"]:hover:not(:focus) { /* Don't apply when focused to avoid conflict */
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-        }
-        @media (prefers-color-scheme: dark) {
-            input[type="number"]:hover:not(:focus) {
-                box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15); /* Brighter glow on hover */
-            }
-        }
-
-        /* Gradient text class for header */
-        .gradient-text {
-            background: linear-gradient(90deg, #0ea5e9 0%, #4f46e5 100%); /* Sky-500 to Indigo-600 */
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-fill-color: transparent;
-        }
-        @media (prefers-color-scheme: dark) {
-            .gradient-text {
-                background: linear-gradient(90deg, #06b6d4 0%, #818cf8 100%); /* Cyan-500 to Indigo-300 */
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                background-clip: text;
-                text-fill-color: transparent;
-            }
-        }
-
-        /* --- Modern UI Additions --- */
-
-        /* 1. Section header style with gradient underline */
-        .section-header {
-            position: relative;
-            padding-bottom: 0.75rem; /* 12px */
-            display: flex;
-            align-items: center;
-        }
-        .section-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 3rem; /* 48px */
-            height: 3px;
-            background: linear-gradient(90deg, #0ea5e9 0%, #4f46e5 100%); /* Same as light header */
-            border-radius: 99px;
-            transition: all 0.3s ease;
-        }
-        @media (prefers-color-scheme: dark) {
-            .section-header::after {
-                background: linear-gradient(90deg, #06b6d4 0%, #818cf8 100%); /* Same as dark header */
-            }
-        }
-
-        /* 2. SVG Icon styling */
-        .icon {
-            display: inline-block;
-            width: 1.25em; /* 20px */
-            height: 1.25em; /* 20px */
-            stroke-width: 1.5;
-            stroke: currentColor;
-            fill: none;
-            vertical-align: -0.25em;
-            margin-right: 0.5rem; /* 8px */
-            opacity: 0.7;
-        }
-
-        /* 3. Animation for pulsing border on Final Payout */
-        @keyframes pulse-border {
-            0%, 100% {
-                border-color: #06b6d4; /* Cyan-500 */
-                box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
-            }
-            50% {
-                border-color: #818cf8; /* Indigo-300 */
-                box-shadow: 0 0 30px rgba(129, 140, 248, 0.6);
-            }
-        }
-        .animated-final-payout {
-            animation: pulse-border 3s ease-in-out infinite;
-        }
-
-        /* 4. Animation for content fade-in */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .fade-in {
-            animation: fadeInUp 0.5s ease-out forwards;
-            opacity: 0; /* Start hidden */
-        }
-        
-        /* Staggered delays */
-        .delay-100 { animation-delay: 0.1s; }
-        .delay-200 { animation-delay: 0.2s; }
-        .delay-300 { animation-delay: 0.3s; }
-        .delay-400 { animation-delay: 0.4s; }
-        .delay-500 { animation-delay: 0.5s; }
-        .delay-600 { animation-delay: 0.6s; }
-        .delay-700 { animation-delay: 0.7s; }
-
-        /* 5. Progress Bar Gradients (Color-Coded) */
-        .progress-red {
-            /* Light Mode: Red-300 to Red-700 (Very noticeable range) */
-            background: linear-gradient(90deg, #fca5a5, #b91c1c); 
-            transition: all 0.5s ease-in-out;
-        }
-        @media (prefers-color-scheme: dark) {
-            .progress-red {
-                /* Dark Mode: Red-500 to Red-900 (Deep, rich gradient) */
-                background: linear-gradient(90deg, #ef4444, #450a0a); 
-            }
-        }
-        .progress-orange {
-            /* Light Mode: Amber-200 to Orange-700 */
-            background: linear-gradient(90deg, #fde68a, #c2410c); 
-            transition: all 0.5s ease-in-out;
-        }
-        @media (prefers-color-scheme: dark) {
-            .progress-orange {
-                /* Dark Mode: Orange-400 to Yellow-900 */
-                background: linear-gradient(90deg, #fb923c, #422006); 
-            }
-        }
-        /* Default for 90% and above */
-        .progress-green {
-            /* Light Mode: Lime-300 to Emerald-700 */
-            background: linear-gradient(90deg, #a3e635, #047857); 
-            transition: all 0.5s ease-in-out;
-        }
-        @media (prefers-color-scheme: dark) {
-            .progress-green {
-                /* Dark Mode: Green-400 to Green-900 */
-                background: linear-gradient(90deg, #4ade80, #064e3b); 
-            }
-        }
-
-        /* 6. Tier Status Chip Styling */
-        .tier-chip {
-            display: inline-block;
-            padding: 0.25rem 0.75rem; /* py-1 px-3 */
-            border-radius: 9999px; /* full rounded */
-            font-size: 0.875rem; /* text-sm */
-            font-weight: 700; /* font-bold */
-            margin-top: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-
-        /* 7. Input Card Focus Highlight */
-        .card-focus-highlight {
-            background-color: #ecfeff; /* Light Cyan 50 */
-            border-color: #06b6d4 !important;
-            box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.2);
-        }
-        @media (prefers-color-scheme: dark) {
-            .card-focus-highlight {
-                background-color: #083344; /* Dark Cyan 900/50 */
-                border-color: #22d3ee !important;
-                box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.2);
-            }
-        }
-        
-        /* 8. Total Base Commission Gradient */
-        .base-commission-gradient {
-            /* Light Mode */
-            background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%); /* Sky 50 to Sky 100 */
-        }
-        @media (prefers-color-scheme: dark) {
-            .base-commission-gradient {
-                /* Dark Mode */
-                background: linear-gradient(90deg, #1e293b 0%, #0f172a 100%); /* Slate 800 to Slate 900 */
-            }
-        }
-        /* Ensure the input card has a subtle pointer style */
-        .input-category-card {
-            cursor: pointer;
-        }
-
-        /* --- FIX: Progress Bar Text Legibility (New Style) --- */
-        .progress-text-overlay {
-            /* Default to dark gray text in light mode */
-            color: #334155; 
-            /* Subtle white stroke for contrast against colored fill */
-            text-shadow: 
-                1px 1px 0 #fff,
-                -1px -1px 0 #fff,
-                1px -1px 0 #fff,
-                -1px 1px 0 #fff,
-                2px 2px 4px rgba(0,0,0,0.3); /* Subtle drop shadow for depth */
-            transition: all 0.3s ease;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .progress-text-overlay {
-                 /* Default to light gray text in dark mode */
-                color: #e5e7eb; 
-                /* Subtle dark stroke for contrast against light background/colored fill */
-                text-shadow: 
-                    1px 1px 0 #000,
-                    -1px -1px 0 #000,
-                    1px -1px 0 #000,
-                    -1px 1px 0 #000,
-                    2px 2px 4px rgba(255,255,255,0.2); /* Subtle light drop shadow */
-            }
+        .dark-glass {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
         }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8 flex flex-col items-center justify-center overflow-x-hidden transition-colors duration-300">
+<body class="bg-slate-50 text-slate-800 min-h-screen transition-colors duration-200">
 
-    <!-- Main Calculator Panel - Large Rounded Container -->
-    <div id="app" class="w-full max-w-xl md:max-w-6xl lg:max-w-7xl bg-white dark:bg-gray-900 p-6 md:p-10 shadow-2xl rounded-3xl dark-glow transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-16">
         
-        <!-- Header -->
-        <h1 class="text-3xl sm:text-4xl font-extrabold text-gray-800 dark:text-gray-50 mb-8 md:mb-10 text-center border-b border-gray-200 dark:border-gray-700 pb-5 gradient-text">
-            RSM Bonus Calculator
-        </h1>
-
-        <!-- Content Area: Two-column grid on desktop -->
-        <div class="md:grid md:grid-cols-2 md:gap-12">
-            
-            <!-- COLUMN 1: Inputs -->
+        <!-- Header Section -->
+        <header class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-200 pb-6">
             <div>
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 18H7.5m3-6h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0M3.75 12H7.5" /></svg>
-                    Inputs
-                </h2>
-
-                <!-- Store's Net Gross Profit Input Card -->
-                <div id="netGpMtdCard" class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-6 transition-all duration-300 fade-in border border-gray-100 dark:border-gray-700">
-                    <label for="netGpMtdInput" class="block text-sm font-semibold text-cyan-700 dark:text-cyan-300 mb-3">Store’s Net Gross Profit (MTD) ($)</label>
-                    <input type="number" id="netGpMtdInput" min="0" oninput="calculateCommission()"
-                           class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
-                           placeholder="Enter Gross Profit">
-                    <!-- Updated to use the tier-chip styling -->
-                    <div id="tierStatus" class="text-xs text-cyan-600 dark:text-cyan-400 mt-4 text-center font-medium flex justify-center">
-                        <div class="tier-chip bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Awaiting Valid Input</div>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <span class="p-2 bg-emerald-600 text-white rounded-lg inline-flex items-center justify-center shadow-lg shadow-emerald-600/25">
+                        <i data-lucide="coins" class="w-6 h-6"></i>
+                    </span>
+                    <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-slate-900">
+                        Manager Bonus Calculator
+                    </h1>
                 </div>
+                <p class="text-sm sm:text-base text-slate-500 mt-1">
+                    Calculate Gross Profit Tiers, metric attainments, personal commissions, and apply customized accelerators.
+                </p>
+            </div>
+            
+            <!-- Quick Controls & Actions -->
+            <div class="flex flex-wrap items-center gap-2 no-print">
+                <button onclick="setPerformancePreset(100)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5">
+                    <i data-lucide="check-circle-2" class="w-4 h-4"></i>
+                    100% Performance
+                </button>
+                <button onclick="setPerformancePreset(125)" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5">
+                    <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    Max Cap (125%)
+                </button>
+                <button onclick="resetCalculator()" class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-md text-xs font-semibold transition-colors flex items-center gap-1.5">
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                    Reset
+                </button>
+                <button onclick="window.print()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md text-xs font-semibold transition-all shadow-md shadow-emerald-600/10 flex items-center gap-1.5">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    Print Report
+                </button>
+            </div>
+        </header>
 
-                <!-- Accelerator Input Card -->
-                <div class="bg-gray-50 dark:bg-gray-800 p-6 rounded-xl shadow-lg dark-glow mb-8 transition-all duration-300 fade-in delay-100">
-                    <label for="acceleratorInput" class="block text-sm font-semibold text-red-700 dark:text-red-300 mb-3">Accelerator / Decelerator (%)</label>
-                    <input type="number" id="acceleratorInput" min="-45" max="45" step="1" oninput="calculateCommission()"
-                           class="w-full p-4 text-2xl font-extrabold text-center bg-white dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-0 input-focus-cyan transition duration-150 shadow-inner"
-                           placeholder="0">
-                    <p class="text-xs text-red-600 dark:text-red-400 mt-2 text-center">Range: -45% to +45%.</p>
-                    <div id="acceleratorError" class="text-sm font-bold text-center text-red-800 bg-red-200 dark:bg-red-900/50 dark:text-red-300 p-3 rounded-xl mt-4 shadow-lg hidden" role="alert">
-                        Error: Value must be between -45 and 45.
-                    </div>
-                </div>
+        <main class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            
+            <!-- Left Side Controls and Data Entry (7 Cols) -->
+            <div class="lg:col-span-7 flex flex-col gap-6 no-print">
                 
-                <!-- Targets & Actuals Sub-Header -->
-                <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
-                    <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
-                    Targets & Actuals
-                </h2>
-                
-                <!-- Category Breakdown Inputs -->
-                <div id="categoryInputs" class="space-y-4 mb-8 md:mb-0 fade-in delay-200">
-                    
-                    <!-- Voice Card (Qty) -->
-                    <div data-target="voiceResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Voice (Qty)</h3>
-                        <div class="flex space-x-6"> 
-                            <div class="w-1/2">
-                                <label for="voiceTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <input type="number" id="voiceTarget" data-category="voice" min="1" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                <!-- Card 1: Gross Profit and Tiering Selector -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-emerald-500"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="dollar-sign" class="text-emerald-500 w-5 h-5"></i>
+                                Store Gross Profit
+                            </h2>
+                            <p class="text-xs text-slate-400">Stores GP tier determines base metric payout potentials</p>
+                        </div>
+                        <span id="tier-badge" class="px-3 py-1 bg-emerald-50 text-emerald-700 text-sm font-bold rounded-full border border-emerald-200 shadow-sm animate-pulse">
+                            Pending GP
+                        </span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label for="store-gp" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Store GP ($)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-medium">$</span>
+                                <input type="number" id="store-gp" value="" oninput="handleGpChange(this.value)" class="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-lg font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all" placeholder="Enter GP Amount">
                             </div>
-                            <div class="w-1/2">
-                                <label for="voiceActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <input type="number" id="voiceActual" data-category="voice" min="0" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">GP Tier Bracket Range</label>
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center h-[52px]">
+                                <span id="tier-bracket" class="text-sm font-semibold text-slate-700">Enter Store GP</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- BTS Card (Qty) -->
-                    <div data-target="btsResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">BTS (Qty)</h3>
-                        <div class="flex space-x-6">
-                            <div class="w-1/2">
-                                <label for="btsTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <input type="number" id="btsTarget" data-category="bts" min="1" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                    <!-- GP Progress Bar Visualizer to Next Tier -->
+                    <div class="mt-6">
+                        <div class="flex justify-between items-center text-xs text-slate-400 mb-1">
+                            <span id="gp-visual-min">$0</span>
+                            <span id="gp-visual-progress">Progress to Next Tier: --%</span>
+                            <span id="gp-visual-max">$11,000</span>
+                        </div>
+                        <div class="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
+                            <div id="gp-progress-bar" class="bg-gradient-to-r from-emerald-500 to-teal-500 h-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p id="gp-visual-advisor" class="text-xs font-medium text-slate-500 mt-2 flex items-center gap-1">
+                            <i data-lucide="info" class="w-3.5 h-3.5"></i>
+                            Enter Store GP above to determine Tier base payouts.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Card 2: Metrics Targets and Attainment Inputs -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="target" class="text-slate-700 w-5 h-5"></i>
+                                Metric Attainment Inputs
+                            </h2>
+                            <p class="text-xs text-slate-400">Specify targets and achievement to calculate payouts</p>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded">Min: 80% / Cap: 125%</span>
+                    </div>
+
+                    <!-- Metrics Input List -->
+                    <div class="space-y-4">
+                        
+                        <!-- Metric Row Header -->
+                        <div class="hidden md:grid grid-cols-12 gap-4 text-xs font-bold text-slate-400 uppercase tracking-wider px-2">
+                            <div class="col-span-4">Metric Title</div>
+                            <div class="col-span-3">Target Amount</div>
+                            <div class="col-span-3">Attainment Amount</div>
+                            <div class="col-span-2 text-right">Raw %</div>
+                        </div>
+
+                        <!-- 1. Voice -->
+                        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="col-span-4 flex items-center gap-3">
+                                    <span class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                                        <i data-lucide="phone-call" class="w-5 h-5"></i>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">Voice Payout</h3>
+                                        <span id="voice-base-badge" class="text-xs text-slate-400 font-medium">Base: --</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Target</label>
+                                    <input type="number" id="voice-target" value="" oninput="calculateResults()" placeholder="e.g., 100" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Attainment</label>
+                                    <input type="number" id="voice-attainment" value="" oninput="calculateResults()" placeholder="e.g., 95" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <div id="voice-raw-pct" class="text-base font-bold text-slate-400">--</div>
+                                    <div id="voice-status" class="text-[10px] font-bold text-slate-400">Pending Input</div>
+                                </div>
                             </div>
-                            <div class="w-1/2">
-                                <label for="btsActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <input type="number" id="btsActual" data-category="bts" min="0" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                        </div>
+
+                        <!-- 2. BTS -->
+                        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="col-span-4 flex items-center gap-3">
+                                    <span class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                                        <i data-lucide="tablet" class="w-5 h-5"></i>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">BTS Payout</h3>
+                                        <span id="bts-base-badge" class="text-xs text-slate-400 font-medium">Base: --</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Target</label>
+                                    <input type="number" id="bts-target" value="" oninput="calculateResults()" placeholder="e.g., 50" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Attainment</label>
+                                    <input type="number" id="bts-attainment" value="" oninput="calculateResults()" placeholder="e.g., 45" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <div id="bts-raw-pct" class="text-base font-bold text-slate-400">--</div>
+                                    <div id="bts-status" class="text-[10px] font-bold text-slate-400">Pending Input</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. VAF (Dollar Target & Attainment) -->
+                        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="col-span-4 flex items-center gap-3">
+                                    <span class="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                                        <i data-lucide="shield-check" class="w-5 h-5"></i>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">VAF Payout ($)</h3>
+                                        <span id="vaf-base-badge" class="text-xs text-slate-400 font-medium">Base: --</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Target ($)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-medium text-sm">$</span>
+                                        <input type="number" id="vaf-target" value="" oninput="calculateResults()" placeholder="19" class="w-full pl-6 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Attainment ($)</label>
+                                    <div class="relative">
+                                        <span class="absolute inset-y-0 left-0 pl-2.5 flex items-center text-slate-400 font-medium text-sm">$</span>
+                                        <input type="number" id="vaf-attainment" value="" oninput="calculateResults()" placeholder="e.g., 15" class="w-full pl-6 pr-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                    </div>
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <div id="vaf-raw-pct" class="text-base font-bold text-slate-400">--</div>
+                                    <div id="vaf-status" class="text-[10px] font-bold text-slate-400">Pending Input</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 4. Accessories -->
+                        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="col-span-4 flex items-center gap-3">
+                                    <span class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                                        <i data-lucide="headphones" class="w-5 h-5"></i>
+                                    </span>
+                                    <div>
+                                        <h3 class="font-bold text-slate-800 text-sm">Accessories Payout</h3>
+                                        <span id="acc-base-badge" class="text-xs text-slate-400 font-medium">Base: --</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Target</label>
+                                    <input type="number" id="acc-target" value="" oninput="calculateResults()" placeholder="e.g., 1000" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Attainment</label>
+                                    <input type="number" id="acc-attainment" value="" oninput="calculateResults()" placeholder="e.g., 1300" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <div id="acc-raw-pct" class="text-base font-bold text-slate-400">--</div>
+                                    <div id="acc-status" class="text-[10px] font-bold text-slate-400">Pending Input</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 5. Rotating Metric -->
+                        <div class="bg-slate-50/50 p-4 rounded-xl border border-slate-100 hover:border-slate-200 transition-all">
+                            <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                                <div class="col-span-4 flex items-center gap-3">
+                                    <span class="p-2 bg-pink-50 text-pink-600 rounded-lg">
+                                        <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                                    </span>
+                                    <div class="w-full pr-2">
+                                        <input type="text" id="rotating-metric-title" value="Rotating Metric" oninput="updateRotatingTitle(this.value)" class="font-bold text-slate-800 text-sm bg-transparent border-b border-dashed border-slate-300 focus:border-emerald-500 focus:outline-none w-full" placeholder="Rename Metric">
+                                        <span id="rot-base-badge" class="text-xs text-slate-400 font-medium">Base: --</span>
+                                    </div>
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Target</label>
+                                    <input type="number" id="rot-target" value="" oninput="calculateResults()" placeholder="e.g., 80" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-3">
+                                    <label class="block md:hidden text-xs font-semibold text-slate-500 mb-1">Attainment</label>
+                                    <input type="number" id="rot-attainment" value="" oninput="calculateResults()" placeholder="e.g., 80" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold focus:ring-2 focus:ring-emerald-500 focus:outline-none">
+                                </div>
+                                <div class="col-span-2 text-right">
+                                    <div id="rot-raw-pct" class="text-base font-bold text-slate-400">--</div>
+                                    <div id="rot-status" class="text-[10px] font-bold text-slate-400">Pending Input</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Card 3: Personal Sales & Commission Tracker -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-2 h-full bg-indigo-500"></div>
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="user-check" class="text-indigo-500 w-5 h-5"></i>
+                                Personal Sales Commission
+                            </h3>
+                            <p class="text-xs text-slate-400">Specify your personal commission to see your 75% manager payout added to the total.</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <div>
+                            <label for="personal-commission" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total Personal Commission ($)</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 font-medium">$</span>
+                                <input type="number" id="personal-commission" value="" oninput="calculateResults()" class="w-full pl-8 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-lg font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all" placeholder="Enter Amount">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Manager Commission Share (75%)</label>
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 flex flex-col justify-center h-[52px]">
+                                <span id="manager-commission-share" class="text-lg font-extrabold text-indigo-600">$0.00</span>
                             </div>
                         </div>
                     </div>
+                    <p class="text-xs font-medium text-indigo-500 mt-3 flex items-center gap-1.5">
+                        <i data-lucide="info" class="w-4 h-4"></i>
+                        Managers receive a 75% payout share from personal commission sales.
+                    </p>
+                </div>
 
-                    <!-- Rotating Metric Card (Qty) -->
-                    <div data-target="rotatingmetricResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mb-4">Rotating Metric (Qty)</h3>
-                        <div class="flex space-x-6">
-                            <div class="w-1/2">
-                                <label for="rotatingmetricTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target</label>
-                                <input type="number" id="rotatingmetricTarget" data-category="rotatingmetric" min="1" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
-                            </div>
-                            <div class="w-1/2">
-                                <label for="rotatingmetricActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual</label>
-                                <input type="number" id="rotatingmetricActual" data-category="rotatingmetric" min="0" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
-                            </div>
+                <!-- Card 4: Decelerator / Accelerator Option -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 relative overflow-hidden">
+                    <div id="modifier-edge" class="absolute top-0 left-0 w-2 h-full bg-slate-400 transition-colors duration-200"></div>
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="gauge" class="text-slate-500 w-5 h-5"></i>
+                                Decelerator / Accelerator
+                            </h3>
+                            <p class="text-xs text-slate-400">Scale the final bonus up or down by a set percentage adjustment (from -45% to +45%)</p>
                         </div>
+                        <span id="modifier-badge" class="px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full border border-slate-200">
+                            Neutral (0%)
+                        </span>
                     </div>
 
-                    <!-- VAF Card ($) -->
-                    <div data-target="vafResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">VAF (Dollar Based)</h3>
-                        <div class="flex space-x-6">
-                            <div class="w-1/2">
-                                <label for="vafTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
-                                <input type="number" id="vafTarget" data-category="vaf" min="1" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center mt-4">
+                        <div class="md:col-span-8 flex flex-col gap-1">
+                            <div class="flex justify-between text-xs font-bold text-slate-400">
+                                <span>Decelerator (-45%)</span>
+                                <span>Neutral (0%)</span>
+                                <span>Accelerator (+45%)</span>
                             </div>
-                            <div class="w-1/2">
-                                <label for="vafActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
-                                <input type="number" id="vafActual" data-category="vaf" min="0" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
-                            </div>
+                            <input type="range" id="modifier-slider" min="-45" max="45" value="0" oninput="handleSliderChange(this.value)" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-600 focus:outline-none">
                         </div>
-                    </div>
-
-                    <!-- Accessories Card ($) -->
-                    <div data-target="accessoriesResult" class="input-category-card p-4 bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-100 dark:border-gray-700 transition-colors duration-300">
-                        <h3 class="text-base font-bold text-cyan-700 dark:text-cyan-300 mb-4">Accessories (Dollar Based)</h3>
-                        <div class="flex space-x-6">
-                            <div class="w-1/2">
-                                <label for="accessoriesTarget" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Target ($)</label>
-                                <input type="number" id="accessoriesTarget" data-category="accessories" min="1" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
-                            </div>
-                            <div class="w-1/2">
-                                <label for="accessoriesActual" class="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">Actual ($)</label>
-                                <input type="number" id="accessoriesActual" data-category="accessories" min="0" oninput="calculateCommission()"
-                                       class="w-full p-2 bg-gray-50 dark:bg-gray-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg text-base transition duration-150 focus:ring-0 input-focus-cyan shadow-inner">
+                        <div class="md:col-span-4">
+                            <label for="modifier-number" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 text-center md:text-left">Exact Pct (%)</label>
+                            <div class="relative">
+                                <input type="number" id="modifier-number" min="-45" max="45" value="0" oninput="handleNumberChange(this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-center font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:bg-white transition-all">
+                                <span class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold">%</span>
                             </div>
                         </div>
                     </div>
                 </div>
+
             </div>
 
-            <!-- COLUMN 2: Outputs (Payout Summary) -->
-            <div>
-                <!-- Output Section -->
-                <div id="results" class="space-y-6 md:pt-[5.5rem]">
-                    <!-- Payout Summary Header -->
-                    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 border-b border-gray-200 dark:border-gray-700 pb-3 section-header">
-                        <svg class="icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2c-2.4 0-4.5 1.8-4.5 4.5v1.5h9V10.5C16.5 7.8 14.4 6 12 6zM12 18.75a.75.75 0 0 0 .75-.75V15h-1.5v3a.75.75 0 0 0 .75.75zM2.25 10.5h19.5M3.75 4.5v15h16.5V4.5M6 15h12M12 10.5v3"/></svg>
-                        Payout Summary
+            <!-- Right Side Results Display (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col gap-6">
+                
+                <!-- Main Payout Visual Statement/Card -->
+                <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-emerald-950 text-white rounded-3xl shadow-xl p-6 relative overflow-hidden print-card">
+                    <!-- Absolute glow design items -->
+                    <div class="absolute -top-12 -right-12 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                    <div class="absolute -bottom-12 -left-12 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Estimated Bonus Statement</div>
+                        <span id="summary-date" class="px-2.5 py-1 bg-white/10 text-white rounded-md text-[11px] font-semibold tracking-wide">June 2026</span>
+                    </div>
+
+                    <!-- Payout Focus Gauge and Total -->
+                    <div class="flex flex-col items-center justify-center my-6 py-2">
+                        <span class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Estimated Bonus</span>
+                        <h2 id="total-bonus" class="text-4xl sm:text-5xl font-black mt-2 text-emerald-400 tracking-tight transition-all">$0.00</h2>
+                        
+                        <!-- Payout relative progress -->
+                        <div class="mt-4 flex flex-col items-center gap-1">
+                            <div class="text-xs text-slate-300">
+                                Target Performance Match: <span id="bonus-pct-of-target" class="font-bold text-white">0.0%</span>
+                            </div>
+                            <div class="w-48 bg-white/10 h-1.5 rounded-full overflow-hidden mt-1">
+                                <div id="bonus-radial-progress" class="bg-gradient-to-r from-emerald-400 to-teal-400 h-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Breakdown metrics values inside the badge -->
+                    <div class="border-t border-white/10 pt-5 mt-4 space-y-3 text-sm">
+                        <div class="flex justify-between text-slate-300">
+                            <span>Determined Store GP Level:</span>
+                            <span id="badge-payout-tier" class="font-bold text-white">Pending GP Input</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300">
+                            <span>Store Metrics Payout Subtotal:</span>
+                            <span id="badge-metrics-payout" class="font-bold text-white">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300">
+                            <span>Personal Commission Share (75%):</span>
+                            <span id="badge-personal-share" class="font-bold text-indigo-300">+$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300 pt-2 border-t border-white/5">
+                            <span>Subtotal Before Adjustments:</span>
+                            <span id="badge-subtotal-unadjusted" class="font-bold text-white">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300" id="badge-adjustment-container">
+                            <span id="badge-adjustment-label">Decel/Accel Adjustment:</span>
+                            <span id="badge-adjustment-value" class="font-bold text-white">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300 pt-2 border-t border-white/5">
+                            <span>Subtotal Base Bonus Target:</span>
+                            <span id="badge-total-base" class="font-bold text-white">$0.00</span>
+                        </div>
+                        <div class="flex justify-between text-slate-300">
+                            <span>Max Possible Cap (125% Performance):</span>
+                            <span id="badge-max-cap" class="font-bold text-white text-emerald-400">$0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Metric Breakdown Breakdown List Detail -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 print-card">
+                    <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
+                        <i data-lucide="receipt" class="text-slate-500 w-5 h-5"></i>
+                        Bonus Breakdown Ledger
                     </h2>
 
-                    <!-- COMPACT GRID LAYOUT -->
-                    <div id="payoutDetails" class="grid grid-cols-2 gap-4 fade-in delay-100"> 
+                    <!-- Ledger Table -->
+                    <div class="space-y-4">
                         
-                        <!-- Payout Display Card (Voice) -->
-                        <div id="voiceResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Voice</span>
-                            <!-- Payout text is now color-coded by JS -->
-                            <span id="payoutVoice" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            
-                            <!-- Progress Bar Container with Text Overlay -->
-                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
-                                <!-- Progress Bar Background (Inner div) -->
-                                <div id="voiceProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
-                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
-                                <div id="voiceP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
-                                    Awaiting input...
-                                </div>
+                        <!-- Header -->
+                        <div class="flex items-center justify-between text-[11px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 pb-2">
+                            <span>Metric Name & Status</span>
+                            <div class="flex gap-16">
+                                <span>Applied Payout %</span>
+                                <span class="w-16 text-right">Calculated</span>
                             </div>
                         </div>
-                        
-                        <!-- Payout Display Card (BTS) -->
-                        <div id="btsResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">BTS</span>
-                            <span id="payoutBTS" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <!-- Progress Bar Container with Text Overlay -->
-                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
-                                <div id="btsProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
-                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
-                                <div id="btsP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
-                                    Awaiting input...
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Payout Display Card (Rotating Metric) -->
-                        <div id="rotatingmetricResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Rotating Metric</span>
-                            <span id="payoutRotatingMetric" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <!-- Progress Bar Container with Text Overlay -->
-                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
-                                <div id="rotatingmetricProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
-                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
-                                <div id="rotatingmetricP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
-                                    Awaiting input...
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Payout Display Card (VAF) -->
-                        <div id="vafResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">VAF</span>
-                            <span id="payoutVAF" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <!-- Progress Bar Container with Text Overlay -->
-                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
-                                <div id="vafProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
-                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
-                                <div id="vafP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
-                                    Awaiting input...
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Payout Display Card (Accessories) -->
-                        <div id="accessoriesResult" class="p-4 bg-gray-100 dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-300 relative overflow-hidden">
-                            <span class="text-sm font-semibold text-gray-700 dark:text-gray-300 block truncate">Accessories</span>
-                            <span id="payoutAccessories" class="text-xl font-extrabold text-gray-500 block mt-1">$0.00</span>
-                            <!-- Progress Bar Container with Text Overlay -->
-                            <div class="h-6 mt-3 rounded-full overflow-hidden bg-gray-200 dark:bg-gray-700 relative">
-                                <div id="accessoriesProgressBar" style="width: 0%;" class="h-full absolute top-0 left-0 transition-all duration-500"></div>
-                                <!-- Percentage Text Overlay - Added progress-text-overlay class -->
-                                <div id="accessoriesP2GText" class="absolute inset-0 flex items-center justify-center text-xs font-bold progress-text-overlay">
-                                    Awaiting input...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Total Base Commission -->
-                    <div class="flex justify-between items-center p-6 base-commission-gradient rounded-xl shadow-xl border border-sky-200 dark:border-gray-700 mt-8 transition-colors duration-300 fade-in delay-200">
-                        <p class="text-lg font-bold text-gray-700 dark:text-gray-300">Total Base Commission</p>
-                        <p id="totalBaseCommission" class="text-2xl font-extrabold text-gray-800 dark:text-gray-100">$0.00</p>
-                    </div>
+                        <!-- 1. Voice Detail -->
+                        <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">Voice</h4>
+                                <p id="voice-ledger-formula" class="text-xs text-slate-400">Enter metrics data</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="voice-applied-pct" class="text-sm font-semibold text-slate-400">--</span>
+                                <span id="voice-ledger-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
 
-                    <!-- Final Payout (with Accelerator) - Highlighting Card -->
-                    <div id="finalPayoutCard" class="flex justify-between items-center p-8 bg-white dark:bg-gray-900 border-4 border-cyan-500 rounded-2xl shadow-2xl transition-all duration-300 fade-in delay-300 animated-final-payout">
-                        <p class="text-xl md:text-2xl font-black text-gray-700 dark:text-gray-50 tracking-wider">FINAL PAYOUT</p>
-                        <p id="finalPayout" class="text-3xl sm:text-4xl lg:text-5xl font-black text-cyan-400">$0.00</p>
+                        <!-- 2. BTS Detail -->
+                        <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">BTS</h4>
+                                <p id="bts-ledger-formula" class="text-xs text-slate-400">Enter metrics data</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="bts-applied-pct" class="text-sm font-semibold text-slate-400">--</span>
+                                <span id="bts-ledger-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- 3. VAF Detail -->
+                        <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">VAF</h4>
+                                <p id="vaf-ledger-formula" class="text-xs text-slate-400">Enter metrics data</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="vaf-applied-pct" class="text-sm font-semibold text-slate-400">--</span>
+                                <span id="vaf-ledger-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- 4. Accessories Detail -->
+                        <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800">Accessories</h4>
+                                <p id="acc-ledger-formula" class="text-xs text-slate-400">Enter metrics data</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="acc-applied-pct" class="text-sm font-semibold text-slate-400">--</span>
+                                <span id="acc-ledger-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- 5. Rotating Detail -->
+                        <div class="flex items-center justify-between py-2 border-b border-slate-50">
+                            <div>
+                                <h4 id="rotating-ledger-title" class="text-sm font-bold text-slate-800">Rotating Metric</h4>
+                                <p id="rot-ledger-formula" class="text-xs text-slate-400">Enter metrics data</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="rot-applied-pct" class="text-sm font-semibold text-slate-400">--</span>
+                                <span id="rot-ledger-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- 6. Personal Sales Ledger Row -->
+                        <div class="flex items-center justify-between py-3 border-b border-slate-50">
+                            <div>
+                                <h4 class="text-sm font-bold text-indigo-900">Personal Commission</h4>
+                                <p id="personal-ledger-formula" class="text-xs text-indigo-500">75% manager share of $0.00 commission</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span class="text-sm font-bold text-indigo-600">75%</span>
+                                <span id="personal-ledger-payout" class="text-sm font-bold text-indigo-700 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- 7. Decelerator / Accelerator Ledger Row -->
+                        <div id="ledger-adjustment-row" class="flex items-center justify-between py-3 border-t border-dashed border-slate-150 bg-slate-50/80 px-2 rounded-lg mt-2 transition-colors duration-200">
+                            <div>
+                                <h4 id="ledger-adj-title" class="text-sm font-bold text-slate-800">Decel / Accel Modifier</h4>
+                                <p id="ledger-adj-formula" class="text-xs text-slate-500">No modification (0.0% adjustment)</p>
+                            </div>
+                            <div class="flex items-center gap-8">
+                                <span id="ledger-adj-applied" class="text-sm font-bold text-slate-600">0.0%</span>
+                                <span id="ledger-adj-payout" class="text-sm font-bold text-slate-800 w-16 text-right">$0.00</span>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
+
+                <!-- Bonus Matrix Reference (Collapsible) -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 no-print">
+                    <button onclick="toggleMatrixReference()" class="w-full flex justify-between items-center text-left focus:outline-none">
+                        <div>
+                            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                                <i data-lucide="table" class="text-slate-500 w-5 h-5"></i>
+                                Bonus Matrix Reference Guide
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Collapse or expand payouts across all 7 GP Tiers</p>
+                        </div>
+                        <i id="matrix-caret" data-lucide="chevron-down" class="w-5 h-5 text-slate-400 transform transition-transform duration-200"></i>
+                    </button>
+                    
+                    <!-- Reference Table Wrapper -->
+                    <div id="matrix-table-container" class="hidden mt-6 overflow-x-auto border border-slate-100 rounded-xl">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500 uppercase tracking-wider font-bold border-b border-slate-100">
+                                    <th class="p-3">Tier / Store GP</th>
+                                    <th class="p-3 text-blue-600">Voice</th>
+                                    <th class="p-3 text-indigo-600">BTS</th>
+                                    <th class="p-3 text-purple-600">VAF</th>
+                                    <th class="p-3 text-amber-600">Accessories</th>
+                                    <th class="p-3 text-pink-600">Rotating</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-50 font-medium">
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T1 (< $11k)</td>
+                                    <td class="p-3">$150</td>
+                                    <td class="p-3">$75</td>
+                                    <td class="p-3">$75</td>
+                                    <td class="p-3">$50</td>
+                                    <td class="p-3">$50</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T2 ($11k - $20,999)</td>
+                                    <td class="p-3">$375</td>
+                                    <td class="p-3">$175</td>
+                                    <td class="p-3">$100</td>
+                                    <td class="p-3">$75</td>
+                                    <td class="p-3">$75</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold text-emerald-700">T3 ($21k - $30,999)</td>
+                                    <td class="p-3 font-semibold text-emerald-700">$600</td>
+                                    <td class="p-3 font-semibold text-emerald-700">$300</td>
+                                    <td class="p-3 font-semibold text-emerald-700">$175</td>
+                                    <td class="p-3 font-semibold text-emerald-700">$150</td>
+                                    <td class="p-3 font-semibold text-emerald-700">$100</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T4 ($31k - $45,999)</td>
+                                    <td class="p-3">$800</td>
+                                    <td class="p-3">$400</td>
+                                    <td class="p-3">$250</td>
+                                    <td class="p-3">$225</td>
+                                    <td class="p-3">$200</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T5 ($46k - $60,999)</td>
+                                    <td class="p-3">$1,000</td>
+                                    <td class="p-3">$500</td>
+                                    <td class="p-3">$325</td>
+                                    <td class="p-3">$300</td>
+                                    <td class="p-3">$250</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T6 ($61k - $79,999)</td>
+                                    <td class="p-3">$1,200</td>
+                                    <td class="p-3">$600</td>
+                                    <td class="p-3">$500</td>
+                                    <td class="p-3">$450</td>
+                                    <td class="p-3">$400</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50/50">
+                                    <td class="p-3 font-bold">T7 (>= $80k)</td>
+                                    <td class="p-3">$1,400</td>
+                                    <td class="p-3">$800</td>
+                                    <td class="p-3">$650</td>
+                                    <td class="p-3">$600</td>
+                                    <td class="p-3">$500</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
 
-        </div> <!-- End md:grid -->
-    </div> <!-- End app container -->
+        </main>
+
+        <!-- Dynamic Modal or Bottom Float message box -->
+        <div id="toast-message" class="fixed bottom-6 right-6 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-2 transform translate-y-24 opacity-0 transition-all duration-300 pointer-events-none z-50">
+            <i data-lucide="check-circle" class="text-emerald-400 w-5 h-5"></i>
+            <span id="toast-text" class="text-sm font-medium">Scenario loaded!</span>
+        </div>
+
+    </div>
 
     <script>
-        // Commission structure constants
-        const CATEGORIES = [
-            { name: 'Voice', id: 'voice' },
-            { name: 'BTS', id: 'bts' },
-            { name: 'Rotating Metric', id: 'rotatingmetric' },
-            { name: 'VAF', id: 'vaf' },
-            { name: 'Accessories', id: 'accessories' },
-        ];
-        const MIN_CAP = 0.80; // 80% minimum payout threshold
-        const ORANGE_CAP = 0.90; // 90% boundary for orange color
-        const MAX_CAP = 1.25; // 125% maximum payout
-        const ACCELERATOR_MIN = -45; 
-        const ACCELERATOR_MAX = 45;  
-
-        // Tier definitions for Max Payouts based on Net GP MTD
-        const GP_TIERS = [
-            // Tier 0: Less than $11,000 (0 - 10,999) - No Payout
-            { min: 0, max: 10999, label: 'Tier 0 (Below $11,000)', rates: { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 } },
-            // Tier 1: 11k - 20,999
-            { min: 11000, max: 20999, label: 'Tier 1 ($11,000 - $20,999)', rates: { voice: 375, bts: 175, vaf: 100, accessories: 75, rotatingmetric: 75 } },
-            // Tier 2: 21k - 30,999
-            { min: 21000, max: 30999, label: 'Tier 2 ($21,000 - $30,999)', rates: { voice: 600, bts: 300, vaf: 175, accessories: 150, rotatingmetric: 100 } },
-            // Tier 3: 31k - 45,999
-            { min: 31000, max: 45999, label: 'Tier 3 ($31,000 - $45,999)', rates: { voice: 800, bts: 400, vaf: 250, accessories: 225, rotatingmetric: 200 } },
-            // Tier 4: 46k - 60,999
-            { min: 46000, max: 60999, label: 'Tier 4 ($46,000 - $60,999)', rates: { voice: 1000, bts: 500, vaf: 325, accessories: 300, rotatingmetric: 250 } },
-            // Tier 5: 61k - 80,999
-            { min: 61000, max: 80999, label: 'Tier 5 ($61,000 - $80,999)', rates: { voice: 1200, bts: 600, vaf: 500, accessories: 450, rotatingmetric: 400 } },
-            // Tier 6: 81k and up
-            { min: 81000, max: 99999999, label: 'Tier 6 ($81,000+)', rates: { voice: 1400, bts: 800, vaf: 650, accessories: 600, rotatingmetric: 500 } },
-        ];
-
-
-        // Utility function to format numbers as currency
-        const formatCurrency = (amount) => {
-            return new Intl.NumberFormat('en-US', {
-                style: 'currency',
-                currency: 'USD',
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-            }).format(amount);
+        // Core Bonus Matrix Data Arrays corresponding to Tiers 1-7 (index 0 to 6)
+        const payoutMatrix = {
+            voice:       [150, 375, 600, 800,  1000, 1200, 1400],
+            bts:         [75,  175, 300, 400,  500,  600,  800],
+            vaf:         [75,  100, 175, 250,  325,  500,  650],
+            accessories: [50,  75,  150, 225,  300,  450,  600],
+            rotating:    [50,  75,  100, 200,  250,  400,  500]
         };
 
-        // Function to determine the max payout based on Net GP MTD
-        function getMaxPayouts(netGpMtd) {
-            const defaultRates = { voice: 0, bts: 0, vaf: 0, accessories: 0, rotatingmetric: 0 };
-            const statusElement = document.getElementById('tierStatus');
-            const cardElement = document.getElementById('netGpMtdCard');
+        // State variables
+        let storeGp = 0;
+        let rotatingTitle = "Rotating Metric";
+        let modifierPct = 0; // percentage from -45 to +45
+
+        // Run immediately when loaded
+        window.onload = function() {
+            // Initialize Lucide SVG Icons
+            lucide.createIcons();
             
-            // Clear previous tier chip classes
-            statusElement.className = 'text-center font-medium mt-4 flex justify-center'; // Ensure alignment is centered
+            // Set dynamic month
+            const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            const currentYear = new Date().getFullYear();
+            const currentMonth = monthNames[new Date().getMonth()];
+            document.getElementById('summary-date').innerText = `${currentMonth} ${currentYear}`;
 
-            // Clear previous card highlight classes
-            cardElement.classList.remove('card-focus-highlight', 'border-4', 'border-indigo-500', 'border-green-500', 'dark:shadow-indigo-500/50', 'dark:shadow-green-500/50', 'shadow-xl');
-            cardElement.classList.add('border-gray-100', 'dark:border-gray-700', 'shadow-lg', 'dark-glow'); // Reset to default style
+            // Perform calculations based on initial form values
+            calculateResults();
+        };
 
-            if (isNaN(netGpMtd) || netGpMtd < 0) { // Check for valid non-negative input
-                statusElement.innerHTML = `<div class="tier-chip bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400">Awaiting Valid Input</div>`;
-                return defaultRates;
-            }
+        // Sync and handle slider inputs
+        function handleSliderChange(val) {
+            let numericVal = parseInt(val) || 0;
+            numericVal = Math.min(45, Math.max(-45, numericVal));
             
-            // Iterate through the tiers to find the match
-            for (const tier of GP_TIERS) {
-                if (netGpMtd >= tier.min && netGpMtd <= tier.max) {
-                    
-                    let tierHtml;
-                    
-                    if (tier.min < 11000) { // Tier 0 (No Payout)
-                        tierHtml = `<div class="tier-chip bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">${tier.label} (No Payout)</div>`;
-                    } else if (tier.min === 81000) { // Tier 6 (Top Tier)
-                        tierHtml = `<div class="tier-chip bg-green-100 dark:bg-green-900/50 text-green-700 dark:text-green-300">${tier.label} Achieved!</div>`;
-                        // Apply strong highlight for top tier
-                        cardElement.classList.remove('border-gray-100', 'dark:border-gray-700');
-                        cardElement.classList.add('border-4', 'border-green-500', 'shadow-xl', 'dark:shadow-green-500/50');
-                    } else { // Tier 1-5 (Profitable Tiers)
-                        tierHtml = `<div class="tier-chip bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300">${tier.label} Achieved</div>`;
-                        // Apply moderate highlight
-                        cardElement.classList.remove('border-gray-100', 'dark:border-gray-700');
-                        cardElement.classList.add('border-4', 'border-indigo-500', 'shadow-xl', 'dark:shadow-indigo-500/50');
-                    }
-                    
-                    statusElement.innerHTML = tierHtml;
-                    return tier.rates;
-                }
-            }
-
-            statusElement.innerHTML = `<div class="tier-chip bg-red-100 dark:bg-red-900/50 text-red-700 dark:text-red-300">Error: Tier Not Found</div>`;
-            return defaultRates;
+            document.getElementById('modifier-number').value = numericVal;
+            modifierPct = numericVal;
+            
+            updateModifierUIEffects();
+            calculateResults();
         }
 
-        // Main calculation function
-        function calculateCommission() {
-            const netGpMtdInput = document.getElementById('netGpMtdInput');
-            // Check for empty string and default to 0 for parsing (as it's a number input)
-            const netGpMtd = parseFloat(netGpMtdInput.value || 0);
-
-            // Get dynamic max payouts based on Net GP MTD
-            const maxPayouts = getMaxPayouts(netGpMtd);
-
-            const acceleratorInput = document.getElementById('acceleratorInput');
-            const acceleratorError = document.getElementById('acceleratorError');
-            
-            // Accelerator defaults to 0 if the field is empty
-            const acceleratorValue = parseFloat(acceleratorInput.value || 0); 
-            const acceleratorPercent = acceleratorValue / 100;
-            
-            let totalBaseCommission = 0;
-
-            // --- Loop through each category for calculation ---
-            for (const category of CATEGORIES) {
-                const targetInput = document.getElementById(`${category.id}Target`);
-                const actualInput = document.getElementById(`${category.id}Actual`);
-                
-                // Get values, default to 0 if field is blank
-                const target = parseFloat(targetInput.value || 0);
-                const actual = parseFloat(actualInput.value || 0); 
-
-                const payoutElement = document.getElementById(`payout${category.name.replace(/\s/g, '')}`); 
-                const progressBarElement = document.getElementById(`${category.id}ProgressBar`);
-                const p2gTextElement = document.getElementById(`${category.id}P2GText`); 
-                
-                // Check if Max Payouts are zero (i.e., GP MTD failed to hit any tier)
-                const categoryMax = maxPayouts[category.id];
-                
-                // Reset text color classes on the payout element
-                payoutElement.classList.remove('text-red-500', 'text-green-500', 'text-orange-500', 'text-gray-500'); 
-                
-                // Note: We no longer remove dynamic P2G text classes, as the color is handled by the CSS stroke/shadow.
-
-                // 1. Input Validation: Target must be > 0 and Actual must be >= 0
-                if (target <= 0 || actual < 0 || categoryMax === 0 || netGpMtd <= 0) {
-                    // If invalid input OR Max Payout is 0, set payout to 0 
-                    payoutElement.textContent = formatCurrency(0);
-                    payoutElement.classList.add('text-gray-500'); 
-                    
-                    let statusText = 'Awaiting input...';
-                    if (categoryMax === 0 && netGpMtd > 0) {
-                        statusText = 'GP MTD tier not met.';
-                    } else if (netGpMtd <= 0) {
-                         statusText = 'Enter GP MTD.';
-                    } else if (target <= 0) {
-                        statusText = 'Enter Target.';
-                    }
-                    
-                    // Update P2G text element
-                    p2gTextElement.textContent = statusText;
-
-                    // Reset progress bar on invalid input (setting it to default color)
-                    if (progressBarElement) { 
-                        const colorClasses = ['progress-red', 'progress-orange', 'progress-green'];
-                        progressBarElement.classList.remove(...colorClasses);
-                        progressBarElement.style.width = '0%';
-                    }
-                    
-                    continue; // Skip calculation for this invalid category
-                }
-                
-                // 2. Calculate Percentage to Goal (P2G)
-                const percentageToGoal = actual / target;
-
-                // --- Dynamic Progress Bar Color based on P2G ---
-                const colorClasses = ['progress-red', 'progress-orange', 'progress-green'];
-                progressBarElement.classList.remove(...colorClasses); // Remove all previous colors
-                
-                // 3. Apply Minimum (0% below 80%) and Maximum (125%) Cap
-                let cappedPercentage = percentageToGoal;
-                let statusText = `${(percentageToGoal * 100).toFixed(2)}%`; // Default display is the percentage
-
-                if (percentageToGoal < MIN_CAP) { // Below 80%
-                    cappedPercentage = 0; // Payout is $0 if below 80%
-                    progressBarElement.classList.add('progress-red');
-                    payoutElement.classList.add('text-red-500'); 
-                    statusText += ' (0% Payout)';
-                } else if (percentageToGoal >= MIN_CAP && percentageToGoal < ORANGE_CAP) { // 80% to 90%
-                    progressBarElement.classList.add('progress-orange');
-                    payoutElement.classList.add('text-orange-500');
-                    statusText += ' (Actual)';
-                } else if (percentageToGoal > MAX_CAP) {
-                    cappedPercentage = MAX_CAP;
-                    progressBarElement.classList.add('progress-green');
-                    payoutElement.classList.add('text-green-500');
-                    statusText += ' (Capped 125%)';
-                } else { // 90% to 125%
-                    progressBarElement.classList.add('progress-green');
-                    payoutElement.classList.add('text-green-500');
-                    statusText += ' (Actual)';
-                }
-                
-                // Calculate Visual Bar Width
-                const visualWidth = Math.min(percentageToGoal * 100, 100); 
-                if (progressBarElement) {
-                    progressBarElement.style.width = `${visualWidth}%`;
-                }
-                
-                // 4. Calculate Base Payout (using the dynamic categoryMax)
-                const categoryPayout = categoryMax * cappedPercentage;
-                totalBaseCommission += categoryPayout;
-
-                // --- Update Category Output ---
-                payoutElement.textContent = formatCurrency(categoryPayout);
-                p2gTextElement.textContent = statusText;
+        // Sync and handle numerical inputs
+        function handleNumberChange(val) {
+            let numericVal = parseInt(val);
+            if (isNaN(numericVal)) {
+                numericVal = 0;
             }
+            numericVal = Math.min(45, Math.max(-45, numericVal));
+            
+            document.getElementById('modifier-slider').value = numericVal;
+            modifierPct = numericVal;
+            
+            updateModifierUIEffects();
+            calculateResults();
+        }
 
-            // --- 5. Final Calculations and Display ---
+        // Beautiful reactive UI updates based on decel/accel selection
+        function updateModifierUIEffects() {
+            const edge = document.getElementById('modifier-edge');
+            const badge = document.getElementById('modifier-badge');
+            const slider = document.getElementById('modifier-slider');
+            const ledgerRow = document.getElementById('ledger-adjustment-row');
 
-            // Check Accelerator Validation
-            if (acceleratorValue < ACCELERATOR_MIN || acceleratorValue > ACCELERATOR_MAX) {
-                 // If accelerator is out of bounds, display error and zero out payouts
-                acceleratorError.classList.remove('hidden'); 
-                document.getElementById('totalBaseCommission').textContent = formatCurrency(0);
-                document.getElementById('finalPayout').textContent = formatCurrency(0);
-                return;
+            edge.className = "absolute top-0 left-0 w-2 h-full transition-colors duration-200";
+            ledgerRow.className = "flex items-center justify-between py-3 border-t border-dashed border-slate-150 px-2 rounded-lg mt-2 transition-colors duration-200";
+
+            if (modifierPct > 0) {
+                edge.classList.add('bg-emerald-500');
+                ledgerRow.classList.add('bg-emerald-50/50');
+                badge.innerText = `Accelerator (+${modifierPct}%)`;
+                badge.className = "px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-200";
+                slider.className = "w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-emerald-500 focus:outline-none";
+            } else if (modifierPct < 0) {
+                edge.classList.add('bg-rose-500');
+                ledgerRow.classList.add('bg-rose-50/30');
+                badge.innerText = `Decelerator (${modifierPct}%)`;
+                badge.className = "px-2.5 py-1 bg-rose-50 text-rose-700 text-xs font-bold rounded-full border border-rose-200";
+                slider.className = "w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-rose-500 focus:outline-none";
             } else {
-                // If valid, ensure error is hidden
-                acceleratorError.classList.add('hidden'); 
-            }
-            
-            // Update Total Base Commission display
-            document.getElementById('totalBaseCommission').textContent = formatCurrency(totalBaseCommission);
-
-            // Apply Accelerator/Decelerator
-            const finalPayout = totalBaseCommission * (1 + acceleratorPercent);
-
-            // Update Final Payout display
-            const finalPayoutText = document.getElementById('finalPayout');
-            const finalPayoutCard = document.getElementById('finalPayoutCard');
-            finalPayoutText.textContent = formatCurrency(finalPayout);
-            
-            // Color coding for final payout text AND card border
-            finalPayoutText.classList.remove('text-red-500', 'text-green-500', 'text-cyan-400');
-            finalPayoutCard.classList.remove('border-red-500', 'border-green-500', 'border-cyan-500');
-
-            if (acceleratorPercent < 0) {
-                 finalPayoutText.classList.add('text-red-500');
-                 finalPayoutCard.classList.add('border-red-500');
-            } else if (acceleratorPercent > 0) {
-                 finalPayoutText.classList.add('text-green-500');
-                 finalPayoutCard.classList.add('border-green-500');
-            } else {
-                 finalPayoutText.classList.add('text-cyan-400'); // Neutral color for 0% acceleration
-                 finalPayoutCard.classList.add('border-cyan-500'); // Neutral border
+                edge.classList.add('bg-slate-400');
+                ledgerRow.classList.add('bg-slate-50/80');
+                badge.innerText = `Neutral (0%)`;
+                badge.className = "px-2.5 py-1 bg-slate-100 text-slate-700 text-xs font-bold rounded-full border border-slate-200";
+                slider.className = "w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-600 focus:outline-none";
             }
         }
 
-        // --- NEW FUNCTION: Setup Input/Output Interaction Effects ---
-        function setupInteractionEffects() {
-            // Gross Profit Input Focus Highlight
-            const gpInput = document.getElementById('netGpMtdInput');
-            const gpCard = document.getElementById('netGpMtdCard');
+        // Main Core Logic calculating everything dynamically
+        function calculateResults() {
+            const gpInputRaw = document.getElementById('store-gp').value;
+            const isGpEmpty = gpInputRaw === "";
+            storeGp = parseFloat(gpInputRaw) || 0;
 
-            gpInput.addEventListener('focus', () => {
-                gpCard.classList.add('card-focus-highlight');
-                // Remove existing tier-based borders while focused
-                gpCard.classList.remove('border-4', 'border-indigo-500', 'border-green-500', 'dark:shadow-indigo-500/50', 'dark:shadow-green-500/50', 'shadow-xl');
+            // Determine current Tier (1 to 7)
+            let tierNum = 1;
+            let bracketLabel = "";
+            let minGp = 0;
+            let maxGp = 11000;
+            let nextTierNum = 2;
+            let nextTierMin = 11000;
+
+            if (storeGp < 11000) {
+                tierNum = 1;
+                bracketLabel = "Less than $11,000";
+                minGp = 0;
+                maxGp = 11000;
+                nextTierMin = 11000;
+                nextTierNum = 2;
+            } else if (storeGp >= 11000 && storeGp < 21000) {
+                tierNum = 2;
+                bracketLabel = "$11,000 - $20,999";
+                minGp = 11000;
+                maxGp = 21000;
+                nextTierMin = 21000;
+                nextTierNum = 3;
+            } else if (storeGp >= 21000 && storeGp < 31000) {
+                tierNum = 3;
+                bracketLabel = "$21,000 - $30,999";
+                minGp = 21000;
+                maxGp = 31000;
+                nextTierMin = 31000;
+                nextTierNum = 4;
+            } else if (storeGp >= 31000 && storeGp < 46000) {
+                tierNum = 4;
+                bracketLabel = "$31,000 - $45,999";
+                minGp = 31000;
+                maxGp = 46000;
+                nextTierMin = 46000;
+                nextTierNum = 5;
+            } else if (storeGp >= 46000 && storeGp < 61000) {
+                tierNum = 5;
+                bracketLabel = "$46,000 - $60,999";
+                minGp = 46000;
+                maxGp = 61000;
+                nextTierMin = 61000;
+                nextTierNum = 6;
+            } else if (storeGp >= 61000 && storeGp < 80000) {
+                tierNum = 6;
+                bracketLabel = "$61,000 - $79,999";
+                minGp = 61000;
+                maxGp = 80000;
+                nextTierMin = 80000;
+                nextTierNum = 7;
+            } else {
+                tierNum = 7;
+                bracketLabel = "$80,000 or greater";
+                minGp = 80000;
+                maxGp = 100000; 
+                nextTierMin = 80000;
+                nextTierNum = 7;
+            }
+
+            const tierIndex = tierNum - 1;
+
+            // Handle Empty Gross Profit cleanly
+            if (isGpEmpty) {
+                document.getElementById('tier-badge').innerText = `Pending GP`;
+                document.getElementById('tier-bracket').innerText = "Enter Store GP";
+                document.getElementById('badge-payout-tier').innerText = "Pending GP Input";
+                
+                document.getElementById('gp-visual-min').innerText = "$0";
+                document.getElementById('gp-visual-max').innerText = "$11,000";
+                document.getElementById('gp-visual-progress').innerText = "Progress to Next Tier: --%";
+                document.getElementById('gp-visual-advisor').innerHTML = `<i class="w-3.5 h-3.5 text-slate-400" data-lucide="info"></i> Enter Store GP to evaluate bonus tiers.`;
+                document.getElementById('gp-progress-bar').style.width = `0%`;
+            } else {
+                document.getElementById('tier-badge').innerText = `Tier ${tierNum}`;
+                document.getElementById('tier-bracket').innerText = bracketLabel;
+                document.getElementById('badge-payout-tier').innerText = `Tier ${tierNum} (${bracketLabel})`;
+
+                document.getElementById('gp-visual-min').innerText = `$${minGp.toLocaleString()}`;
+                document.getElementById('gp-visual-max').innerText = tierNum === 7 ? 'Max Tier reached' : `$${maxGp.toLocaleString()}`;
+                
+                let gpPercent = 0;
+                if (tierNum === 7) {
+                    gpPercent = 100;
+                    document.getElementById('gp-visual-progress').innerText = "Top Tier Achieved!";
+                    document.getElementById('gp-visual-advisor').innerHTML = `<i class="w-4 h-4 text-amber-400" data-lucide="crown"></i> Master Tier! Complete targets to unlock maximum available payouts.`;
+                } else {
+                    const diff = storeGp - minGp;
+                    const tierRange = maxGp - minGp;
+                    gpPercent = Math.min(100, Math.max(0, (diff / tierRange) * 100));
+                    document.getElementById('gp-visual-progress').innerText = `Progress to Next Tier: ${Math.round(gpPercent)}%`;
+                    
+                    const neededGP = maxGp - storeGp;
+                    document.getElementById('gp-visual-advisor').innerHTML = `<i class="w-3.5 h-3.5 text-emerald-600" data-lucide="sparkles"></i> Earn $${neededGP.toLocaleString()} more GP to unlock Tier ${nextTierNum} base payouts!`;
+                }
+                document.getElementById('gp-progress-bar').style.width = `${gpPercent}%`;
+            }
+
+            // Metrics Calculations config array
+            const metricsConfigs = [
+                { id: 'voice', label: 'Voice' },
+                { id: 'bts', label: 'BTS' },
+                { id: 'vaf', label: 'VAF' },
+                { id: 'acc', label: 'Accessories', matrixKey: 'accessories' },
+                { id: 'rot', label: 'Rotating Metric', matrixKey: 'rotating' }
+            ];
+
+            let totalPayout = 0;
+            let totalBasePotential = 0;
+            let totalMaxPotential = 0;
+
+            metricsConfigs.forEach(m => {
+                const targetInput = document.getElementById(`${m.id}-target`).value;
+                const attainmentInput = document.getElementById(`${m.id}-attainment`).value;
+                
+                const targetVal = parseFloat(targetInput);
+                const attainmentVal = parseFloat(attainmentInput);
+                
+                const key = m.matrixKey || m.id;
+                const basePay = payoutMatrix[key][tierIndex];
+
+                // If GP is empty, hide base metric projections in rows
+                if (isGpEmpty) {
+                    document.getElementById(`${m.id}-base-badge`).innerText = "Base: (Pending GP)";
+                } else {
+                    document.getElementById(`${m.id}-base-badge`).innerText = `Base: $${basePay.toLocaleString()}`;
+                }
+
+                // If inputs are empty, evaluate cleanly as Pending
+                if (targetInput === "" || attainmentInput === "" || isNaN(targetVal) || isNaN(attainmentVal)) {
+                    document.getElementById(`${m.id}-raw-pct`).innerText = "--";
+                    document.getElementById(`${m.id}-raw-pct`).className = "text-base font-bold text-slate-400";
+                    
+                    const statusEl = document.getElementById(`${m.id}-status`);
+                    statusEl.innerText = "Pending Input";
+                    statusEl.className = "text-[10px] font-bold text-slate-400";
+
+                    document.getElementById(`${m.id}-applied-pct`).innerText = "--";
+                    document.getElementById(`${m.id}-applied-pct`).className = "text-sm font-semibold text-slate-400";
+                    document.getElementById(`${m.id}-ledger-payout`).innerText = "$0.00";
+                    document.getElementById(`${m.id}-ledger-formula`).innerText = "Enter metric details above";
+                    
+                    if (!isGpEmpty) {
+                        totalBasePotential += basePay;
+                        totalMaxPotential += basePay * 1.25;
+                    }
+                    return;
+                }
+
+                // Calculate performance percentage
+                let rawPct = 0;
+                if (targetVal > 0) {
+                    rawPct = (attainmentVal / targetVal) * 100;
+                }
+
+                document.getElementById(`${m.id}-raw-pct`).innerText = `${rawPct.toFixed(1)}%`;
+                document.getElementById(`${m.id}-raw-pct`).className = "text-base font-bold text-slate-700";
+
+                // Calculate dynamic payout based on constraints: Min threshold 80%, Cap at 125%
+                let appliedPct = rawPct;
+                let statusText = "Active";
+                let statusColor = "text-emerald-600";
+
+                if (rawPct < 80) {
+                    appliedPct = 0;
+                    statusText = "Missed (<80%)";
+                    statusColor = "text-rose-500";
+                } else if (rawPct > 125) {
+                    appliedPct = 125;
+                    statusText = "Capped (125%)";
+                    statusColor = "text-teal-600";
+                } else {
+                    statusText = "Active (Paid)";
+                    statusColor = "text-emerald-600";
+                }
+
+                const payoutAmount = (appliedPct / 100) * basePay;
+                totalPayout += payoutAmount;
+                totalBasePotential += basePay;
+                totalMaxPotential += basePay * 1.25;
+
+                const statusEl = document.getElementById(`${m.id}-status`);
+                statusEl.innerText = statusText;
+                statusEl.className = `text-[10px] font-bold ${statusColor}`;
+
+                // Update ledger displays
+                let formatApplied = `${rawPct.toFixed(1)}%`;
+                if (rawPct < 80) formatApplied = "0% (Miss)";
+                if (rawPct > 125) formatApplied = "125% (Cap)";
+
+                document.getElementById(`${m.id}-applied-pct`).innerText = formatApplied;
+                document.getElementById(`${m.id}-applied-pct`).className = `text-sm font-bold ${rawPct < 80 ? 'text-rose-500' : (rawPct > 125 ? 'text-teal-600' : 'text-slate-600')}`;
+
+                document.getElementById(`${m.id}-ledger-payout`).innerText = `$${payoutAmount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                
+                let performanceDesc = `${rawPct.toFixed(1)}% performance of $${basePay} base`;
+                if (rawPct > 125) performanceDesc = `Capped 125% performance of $${basePay} base`;
+                if (rawPct < 80) performanceDesc = `Below 80% threshold ($${basePay} base)`;
+                document.getElementById(`${m.id}-ledger-formula`).innerText = performanceDesc;
             });
 
-            gpInput.addEventListener('blur', () => {
-                gpCard.classList.remove('card-focus-highlight');
-                // Re-run calculation to re-apply the tier-based border color (handled in getMaxPayouts)
-                calculateCommission(); 
-            });
+            // Calculate Personal Sales Commission additions
+            const personalCommInput = parseFloat(document.getElementById('personal-commission').value) || 0;
+            const personalShare = personalCommInput * 0.75;
 
+            // Combined Unadjusted Subtotal (Metrics Subtotal + Personal Commission Share)
+            const unadjustedSubtotal = totalPayout + personalShare;
 
-            // Existing logic for linking category inputs to category outputs (Hover)
-            const inputCards = document.querySelectorAll('.input-category-card');
+            // Compute Decelerator / Accelerator Modification
+            const modifierValueUSD = unadjustedSubtotal * (modifierPct / 100);
+            const combinedTotalBonus = unadjustedSubtotal + modifierValueUSD;
 
-            inputCards.forEach(inputCard => {
-                const targetId = inputCard.getAttribute('data-target');
-                const targetCard = document.getElementById(targetId);
+            // Update Personal Sales UI fields
+            document.getElementById('manager-commission-share').innerText = `$${personalShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('badge-metrics-payout').innerText = `$${totalPayout.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('badge-personal-share').innerText = `+$${personalShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('badge-subtotal-unadjusted').innerText = `$${unadjustedSubtotal.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
 
-                if (targetCard) {
-                    // Mouse Enter: Highlight the target output card
-                    inputCard.addEventListener('mouseenter', () => {
-                        // Added slight background change for visual linking
-                        targetCard.classList.add('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10');
-                        targetCard.classList.remove('bg-gray-100', 'dark:bg-gray-800');
-                        targetCard.classList.add('bg-cyan-50', 'dark:bg-gray-700');
-                    });
+            // Update Statement Modifier adjustment fields
+            const adjustmentValueContainer = document.getElementById('badge-adjustment-value');
+            const adjustmentLabel = document.getElementById('badge-adjustment-label');
+            const adjustmentWrapper = document.getElementById('badge-adjustment-container');
+            
+            adjustmentLabel.innerText = `Modifier (${modifierPct >= 0 ? '+' : ''}${modifierPct}%):`;
+            if (modifierPct > 0) {
+                adjustmentValueContainer.innerText = `+$${modifierValueUSD.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                adjustmentValueContainer.className = "font-bold text-emerald-400";
+                adjustmentWrapper.className = "flex justify-between text-emerald-300 font-semibold";
+            } else if (modifierPct < 0) {
+                adjustmentValueContainer.innerText = `-$${Math.abs(modifierValueUSD).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                adjustmentValueContainer.className = "font-bold text-rose-400";
+                adjustmentWrapper.className = "flex justify-between text-rose-300 font-semibold";
+            } else {
+                adjustmentValueContainer.innerText = `$0.00`;
+                adjustmentValueContainer.className = "font-bold text-slate-300";
+                adjustmentWrapper.className = "flex justify-between text-slate-300";
+            }
+            
+            // Update Personal Sales ledger detail
+            document.getElementById('personal-ledger-payout').innerText = `$${personalShare.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('personal-ledger-formula').innerText = `75% manager share of $${personalCommInput.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})} commission`;
 
-                    // Mouse Leave: Remove the highlight
-                    inputCard.addEventListener('mouseleave', () => {
-                        targetCard.classList.remove('shadow-xl', 'border-cyan-500', 'ring-4', 'ring-cyan-500/50', 'scale-[1.03]', 'z-10', 'bg-cyan-50', 'dark:bg-gray-700');
-                        targetCard.classList.add('bg-gray-100', 'dark:bg-gray-800');
-                    });
+            // Update Ledger Modifier details
+            const ledgerAdjTitle = document.getElementById('ledger-adj-title');
+            const ledgerAdjFormula = document.getElementById('ledger-adj-formula');
+            const ledgerAdjApplied = document.getElementById('ledger-adj-applied');
+            const ledgerAdjPayout = document.getElementById('ledger-adj-payout');
+
+            ledgerAdjApplied.innerText = `${modifierPct >= 0 ? '+' : ''}${modifierPct.toFixed(1)}%`;
+            ledgerAdjPayout.innerText = `${modifierPct >= 0 ? '+' : '-'}$${Math.abs(modifierValueUSD).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            if (modifierPct > 0) {
+                ledgerAdjTitle.className = "text-sm font-bold text-emerald-900";
+                ledgerAdjFormula.innerText = `Accelerator increases the $${unadjustedSubtotal.toLocaleString(undefined, {minimumFractionDigits: 2})} subtotal by +${modifierPct}%`;
+                ledgerAdjFormula.className = "text-xs text-emerald-600";
+                ledgerAdjApplied.className = "text-sm font-bold text-emerald-600";
+                ledgerAdjPayout.className = "text-sm font-bold text-emerald-700 w-16 text-right";
+            } else if (modifierPct < 0) {
+                ledgerAdjTitle.className = "text-sm font-bold text-rose-900";
+                ledgerAdjFormula.innerText = `Decelerator lowers the $${unadjustedSubtotal.toLocaleString(undefined, {minimumFractionDigits: 2})} subtotal by ${modifierPct}%`;
+                ledgerAdjFormula.className = "text-xs text-rose-600";
+                ledgerAdjApplied.className = "text-sm font-bold text-rose-600";
+                ledgerAdjPayout.className = "text-sm font-bold text-rose-700 w-16 text-right";
+            } else {
+                ledgerAdjTitle.className = "text-sm font-bold text-slate-800";
+                ledgerAdjFormula.innerText = `No modification (0.0% adjustment)`;
+                ledgerAdjFormula.className = "text-xs text-slate-500";
+                ledgerAdjApplied.className = "text-sm font-bold text-slate-600";
+                ledgerAdjPayout.className = "text-sm font-bold text-slate-800 w-16 text-right";
+            }
+
+            // Update main final bonus output
+            document.getElementById('total-bonus').innerText = `$${combinedTotalBonus.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            
+            // Calculate percentage of target achieved (based on metrics payout)
+            let targetBonusMatch = 0;
+            if (totalBasePotential > 0) {
+                targetBonusMatch = (totalPayout / totalBasePotential) * 100;
+            }
+            document.getElementById('bonus-pct-of-target').innerText = `${targetBonusMatch.toFixed(1)}%`;
+            document.getElementById('bonus-radial-progress').style.width = `${Math.min(100, targetBonusMatch)}%`;
+
+            // Update ledger potential totals
+            document.getElementById('badge-total-base').innerText = `$${totalBasePotential.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+            document.getElementById('badge-max-cap').innerText = `$${totalMaxPotential.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+            // Recreate icons
+            lucide.createIcons();
+        }
+
+        // Change Store GP callback
+        function handleGpChange(val) {
+            calculateResults();
+        }
+
+        // Update customized rotating metric title dynamically
+        function updateRotatingTitle(val) {
+            rotatingTitle = val || "Rotating Metric";
+            document.getElementById('rotating-ledger-title').innerText = rotatingTitle;
+        }
+
+        // Apply performance preset percentages immediately
+        function setPerformancePreset(targetPercent) {
+            const metrics = [
+                { id: 'voice', defTarget: 100 },
+                { id: 'bts', defTarget: 50 },
+                { id: 'vaf', defTarget: 19 },
+                { id: 'acc', defTarget: 1000 },
+                { id: 'rot', defTarget: 80 }
+            ];
+
+            // If GP is empty, pre-populate with Tier 3 baseline GP ($25,000) for a ready simulation
+            const gpField = document.getElementById('store-gp');
+            if (gpField.value === "") {
+                gpField.value = 25000;
+            }
+
+            metrics.forEach(m => {
+                const targetField = document.getElementById(`${m.id}-target`);
+                const attainmentField = document.getElementById(`${m.id}-attainment`);
+                
+                // If target is empty, set default baseline (specifically 19 for VAF)
+                if (targetField.value === "") {
+                    targetField.value = m.defTarget;
+                }
+                
+                const targetValue = parseFloat(targetField.value);
+                
+                if (targetPercent === 100) {
+                    attainmentField.value = targetValue;
+                } else if (targetPercent === 125) {
+                    attainmentField.value = targetValue * 1.25;
                 }
             });
+
+            calculateResults();
+            showToast(`Preset: Applied ${targetPercent}% performance using standard baselines where empty.`);
         }
 
-        // Initial setup on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            calculateCommission();
-            setupInteractionEffects(); // Call the new setup function
-        });
+        // Reset all fields back to empty manually-typed states
+        function resetCalculator() {
+            document.getElementById('store-gp').value = "";
+            
+            document.getElementById('voice-target').value = "";
+            document.getElementById('voice-attainment').value = "";
+
+            document.getElementById('bts-target').value = "";
+            document.getElementById('bts-attainment').value = "";
+
+            document.getElementById('vaf-target').value = "";
+            document.getElementById('vaf-attainment').value = "";
+
+            document.getElementById('acc-target').value = "";
+            document.getElementById('acc-attainment').value = "";
+
+            document.getElementById('rot-target').value = "";
+            document.getElementById('rot-attainment').value = "";
+            
+            document.getElementById('rotating-metric-title').value = "Rotating Metric";
+            updateRotatingTitle("Rotating Metric");
+
+            // Reset personal commission
+            document.getElementById('personal-commission').value = "";
+
+            // Reset modifier values
+            document.getElementById('modifier-slider').value = 0;
+            document.getElementById('modifier-number').value = 0;
+            modifierPct = 0;
+            updateModifierUIEffects();
+
+            calculateResults();
+            showToast("All fields cleared for manual data entry.");
+        }
+
+        // Toggle bonus matrix reference visual block
+        function toggleMatrixReference() {
+            const container = document.getElementById('matrix-table-container');
+            const caret = document.getElementById('matrix-caret');
+            if (container.classList.contains('hidden')) {
+                container.classList.remove('hidden');
+                caret.style.transform = "rotate(180deg)";
+            } else {
+                container.classList.add('hidden');
+                caret.style.transform = "rotate(0deg)";
+            }
+        }
+
+        // Helper: Custom Toast Messages to replace standard alerts safely
+        function showToast(message) {
+            const toast = document.getElementById('toast-message');
+            const text = document.getElementById('toast-text');
+            text.innerText = message;
+            
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.add('translate-y-24', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 3000);
+        }
     </script>
 </body>
 </html>
